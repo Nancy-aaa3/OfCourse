@@ -3184,8 +3184,18 @@ function confirmClear(){
    即使不注册 SW，本应用为单文件自包含，断网同样可完整使用。
    ========================================================================== */
 const SW_SOURCE = `/* 当然可以 · 个人医疗从业者工作台 — Service Worker（离线缓存） */
-const CACHE = 'dangran-keyi-v4';
-const CORE = ['./', './index.html'];
+const CACHE = 'dangran-keyi-v5';
+const CORE = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icons/favicon-32.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/icon-maskable-192.png',
+  './icons/icon-maskable-512.png',
+  './icons/apple-touch-icon.png'
+];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -3301,19 +3311,30 @@ function isStandalone(){
 }
 
 function injectPWA(){
-  /* 图标 */
+  /* —— 图标：优先使用同目录 PNG 文件（PWABuilder / 应用商店要求）；
+        若外部文件不可用（如以 file:// 单文件方式打开），自动降级为内联 SVG —— */
+  const hasExternal = /^https?:$/.test(location.protocol);
   let lk = document.querySelector('link[rel="icon"]');
   if(!lk){ lk = document.createElement('link'); lk.rel='icon'; document.head.appendChild(lk); }
-  lk.type = 'image/svg+xml';
-  lk.href = buildIcon(192,false);
-  const at = document.createElement('link');
-  at.rel='apple-touch-icon'; at.href = buildIcon(180,false);
-  document.head.appendChild(at);
+  if(hasExternal){
+    lk.type = 'image/png';
+    lk.href = './icons/favicon-32.png';
+    const at = document.createElement('link');
+    at.rel='apple-touch-icon'; at.href = './icons/apple-touch-icon.png';
+    document.head.appendChild(at);
+  }else{
+    lk.type = 'image/svg+xml';
+    lk.href = buildIcon(192,false);
+    const at = document.createElement('link');
+    at.rel='apple-touch-icon'; at.href = buildIcon(180,false);
+    document.head.appendChild(at);
+  }
 
-  /* manifest（内联 data URI，无需外部文件） */
+  /* —— manifest：优先引用同目录真实 manifest.json（可被 PWABuilder 抓取）；
+        离线/单文件场景降级为内联 data URI —— */
   const mk = document.createElement('link');
   mk.rel = 'manifest';
-  mk.href = buildManifest();
+  mk.href = hasExternal ? './manifest.json' : buildManifest();
   document.head.appendChild(mk);
 
   /* iOS / 移动端 PWA 元信息 */
