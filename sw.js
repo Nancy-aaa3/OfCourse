@@ -1,6 +1,16 @@
 /* 当然可以 · 个人医疗从业者工作台 — Service Worker（离线缓存） */
-const CACHE = 'dangran-keyi-v4';
-const CORE = ['./', './index.html'];
+const CACHE = 'dangran-keyi-v5';
+const CORE = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icons/favicon-32.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/icon-maskable-192.png',
+  './icons/icon-maskable-512.png',
+  './icons/apple-touch-icon.png'
+];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
