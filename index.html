@@ -1,0 +1,3535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FAF4F5">
+<title>当然可以 · 个人医疗工作台</title>
+<style>
+:root{
+  /* —— 配色：低饱和干玫瑰灰粉（Dusty Rose）+ 中性灰 —— */
+  /* 底色 / 卡片次要背景 */
+  --pink-50:#FAFAFA;      /* 页面底色 */
+  --pink-100:#FAF4F5;     /* 卡片次要背景 */
+  --pink-150:#F6EFF1;     /* 略深一档的卡片底 */
+  --pink-200:#EFE4E7;     /* 选中态柔底 / 标签底 */
+  --pink-300:#D9B4BA;     /* 主强调色：导航选中、按钮、标签高亮 */
+  --pink-400:#CBA0A7;     /* 主强调色深一档 */
+  --pink-500:#B4868E;     /* 强调深色（小面积） */
+  --pink-600:#9E727B;     /* 正文强调 / 图标 */
+  --pink-700:#8C6A72;     /* 强调文字（深干玫瑰灰，保证可读性） */
+  /* 中性灰文字体系（不使用纯黑） */
+  --ink-900:#3C3F46;      /* 正文文字 */
+  --ink-700:#5A5D64;      /* 次级正文 */
+  --ink-500:#8F8D93;      /* 次要文字、分割线 */
+  --ink-300:#B9B7BC;      /* 更弱提示文字 */
+  --line:#E6E4E7;         /* 常规分割线 */
+  --line-soft:#F0EEF1;    /* 极浅分割线 */
+  --white:#ffffff;
+  --ok:#8FAE9C;
+  --warn:#C7A98A;
+  --danger:#C08A93;
+  --r-lg:20px;
+  --r-md:14px;
+  --r-sm:10px;
+  --shadow-s:0 1px 2px rgba(60,63,70,.04),0 2px 8px rgba(60,63,70,.045);
+  --shadow-m:0 4px 16px rgba(60,63,70,.08);
+  --nav-w:78px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
+  background:#F2F1F3;
+  color:var(--ink-900);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+button,input,textarea,select{font-family:inherit;font-size:inherit;color:inherit;border:none;background:none;outline:none;}
+button{cursor:pointer;}
+::-webkit-scrollbar{width:0;height:0;}
+
+/* ============ 手机外框 ============ */
+#phone{
+  position:relative;margin:0 auto;
+  width:100%;max-width:430px;height:100dvh;
+  background:var(--pink-50);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 0 60px rgba(60,63,70,.10);
+}
+@media(min-width:520px){
+  body{display:flex;align-items:center;justify-content:center;}
+  #phone{height:92dvh;max-height:940px;border-radius:34px;border:1px solid #E6E4E7;}
+}
+#phone::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:transparent;   /* 纯净底色，不使用装饰性渐变 */
+}
+
+/* ============ 状态栏/顶栏 ============ */
+#topbar{
+  position:relative;z-index:20;flex:0 0 auto;
+  padding:calc(var(--safe-t) + 14px) 18px 12px;
+  display:flex;align-items:center;gap:12px;
+}
+#menuBtn{
+  width:38px;height:38px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.72);border:1px solid var(--line);
+  box-shadow:var(--shadow-s);transition:transform .12s;
+}
+#menuBtn:active{transform:scale(.94);}
+#menuBtn svg{width:18px;height:18px;stroke:var(--pink-700);}
+.brand{flex:1;min-width:0;}
+.brand h1{font-size:17px;font-weight:700;letter-spacing:.02em;color:var(--ink-900);}
+.brand p{font-size:11px;color:var(--ink-500);margin-top:1px;letter-spacing:.03em;}
+#syncPill{
+  display:flex;align-items:center;gap:5px;flex:0 0 auto;
+  padding:6px 11px;border-radius:999px;font-size:11px;font-weight:600;
+  border:1px solid var(--line);background:rgba(255,255,255,.7);
+  color:var(--ink-500);transition:all .25s;
+}
+#syncPill .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-300);flex:0 0 auto;}
+#syncPill.on{color:#5f8a6d;border-color:#d6e8db;background:#f2f9f4;}
+#syncPill.on .dot{background:#7fb08d;box-shadow:0 0 0 3px rgba(127,176,141,.18);}
+#syncPill.off{color:#8C6A72;border-color:#EFE4E7;background:#FAF4F5;}
+#syncPill.off .dot{background:#d28a97;}
+
+/* ============ 主体 ============ */
+#body{flex:1;display:flex;min-height:0;position:relative;z-index:10;}
+
+/* 左侧导航 */
+#rail{
+  flex:0 0 var(--nav-w);width:var(--nav-w);
+  padding:4px 8px 10px;overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;gap:6px;
+  border-right:1px solid var(--line-soft);
+}
+.navItem{
+  position:relative;flex:0 0 auto;
+  padding:11px 4px 9px;border-radius:16px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  background:transparent;transition:background .18s,transform .12s;
+  user-select:none;
+}
+.navItem:active{transform:scale(.96);}
+.navItem .ico{
+  width:34px;height:34px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--white);border:1px solid var(--line);
+  box-shadow:var(--shadow-s);transition:all .18s;
+}
+.navItem .ico svg{width:17px;height:17px;stroke:var(--pink-600);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.navItem .nm{
+  font-size:10.5px;font-weight:600;color:var(--ink-500);
+  line-height:1.2;text-align:center;word-break:break-all;
+  max-width:100%;transition:color .18s;
+}
+.navItem.active{background:linear-gradient(180deg,#F6F5F6,#F6EFF1);}
+.navItem.active .ico{background:linear-gradient(160deg,#D9B4BA,#CBA0A7);border-color:transparent;box-shadow:0 3px 10px rgba(140,106,114,.20);}
+.navItem.active .ico svg{stroke:#fff;}
+.navItem.active .nm{color:var(--pink-700);}
+.navItem.dragging{opacity:.35;}
+.navItem.dropMark::before{
+  content:"";position:absolute;left:6px;right:6px;top:-4px;height:2px;
+  border-radius:2px;background:var(--pink-400);
+}
+.navItem .editDot{
+  position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;
+  background:var(--pink-400);display:none;
+}
+body.editing .navItem .editDot{display:block;}
+#railSpacer{flex:1 1 auto;min-height:14px;}
+#railHint{
+  flex:0 0 auto;font-size:9.5px;color:var(--ink-300);text-align:center;
+  line-height:1.5;padding:6px 2px;letter-spacing:.02em;
+}
+
+/* 内容区 */
+#main{flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;padding:0 14px calc(28px + var(--safe-b));-webkit-overflow-scrolling:touch;}
+.page{display:none;animation:fadeIn .22s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+.secHead{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:6px 2px 12px;}
+.secHead h2{font-size:19px;font-weight:700;letter-spacing:.01em;}
+.secHead p{font-size:11.5px;color:var(--ink-500);margin-top:2px;}
+
+.card{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:14px;box-shadow:var(--shadow-s);margin-bottom:12px;
+}
+.card.tint{background:#FAF4F5;}
+
+/* 通用按钮 */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 15px;border-radius:12px;font-size:13px;font-weight:600;
+  background:var(--white);border:1px solid var(--line);color:var(--ink-700);
+  transition:transform .12s,background .16s;white-space:nowrap;
+}
+.btn:active{transform:scale(.96);}
+.btn.primary{background:linear-gradient(160deg,#D9B4BA,#CBA0A7);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(140,106,114,.18);}
+.btn.ghost{background:var(--pink-100);color:var(--pink-700);border-color:#EFE4E7;}
+.btn.danger{color:#8C6A72;border-color:#EFE4E7;background:#FAF4F5;}
+.btn.sm{padding:6px 11px;font-size:12px;border-radius:10px;}
+.btn.block{width:100%;}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+
+/* 输入 */
+.field{margin-bottom:10px;}
+.field label{display:block;font-size:11.5px;font-weight:600;color:var(--ink-500);margin:0 0 5px 3px;letter-spacing:.03em;}
+.inp,textarea.inp,select.inp{
+  width:100%;padding:11px 13px;border-radius:12px;
+  background:var(--pink-50);border:1px solid var(--line);
+  font-size:14px;color:var(--ink-900);transition:all .16s;
+}
+textarea.inp{resize:vertical;min-height:76px;line-height:1.6;}
+.inp:focus,textarea.inp:focus,select.inp:focus{background:#fff;border-color:var(--pink-300);box-shadow:0 0 0 3px rgba(221,168,184,.16);}
+.inp::placeholder{color:var(--ink-300);}
+select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b9708a' stroke-width='2.5' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;}
+.row{display:flex;gap:8px;}
+.row>*{flex:1;min-width:0;}
+
+/* 标签 */
+.tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:600;
+  background:var(--pink-100);color:var(--pink-700);border:1px solid #EFE4E7;
+}
+.tag.gray{background:#F4F3F4;color:var(--ink-500);border-color:#F0EEF1;}
+.tag.ok{background:#f1f8f3;color:#5f8a6d;border-color:#dcecdf;}
+.tag.warn{background:#fdf5ee;color:#a9784f;border-color:#f5e5d6;}
+.tagRow{display:flex;flex-wrap:wrap;gap:6px;}
+
+/* 列表项 */
+.item{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:12px 13px;margin-bottom:9px;box-shadow:var(--shadow-s);
+  position:relative;transition:box-shadow .16s,border-color .16s;
+}
+.item:active{border-color:var(--pink-200);}
+.itemHead{display:flex;align-items:flex-start;gap:9px;}
+.grip{
+  flex:0 0 auto;width:20px;padding:2px 0;display:flex;flex-direction:column;gap:3px;
+  align-items:center;cursor:grab;touch-action:none;
+}
+.grip i{display:block;width:13px;height:1.5px;border-radius:2px;background:var(--pink-300);}
+.itemMb{flex:1;min-width:0;}
+.itemTitle{font-size:14px;font-weight:600;line-height:1.45;word-break:break-word;}
+.itemSub{font-size:11.5px;color:var(--ink-500);margin-top:3px;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+.itemMeta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:7px;}
+.draggingItem{opacity:.4;}
+.dropTarget{border-color:var(--pink-300);box-shadow:0 0 0 2px rgba(221,168,184,.22);}
+
+/* 复选框 */
+.cb{
+  flex:0 0 auto;width:21px;height:21px;border-radius:7px;
+  border:1.6px solid var(--pink-300);background:#fff;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;transition:all .16s;
+}
+.cb svg{width:12px;height:12px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .14s;}
+.cb.on{background:linear-gradient(160deg,#D9B4BA,#CBA0A7);border-color:transparent;}
+.cb.on svg{opacity:1;}
+.done .itemTitle{text-decoration:line-through;color:var(--ink-300);font-weight:500;}
+.done{background:#FCFBFC;}
+.done .itemSub{color:var(--ink-300);}
+
+.iconBtn{
+  flex:0 0 auto;width:26px;height:26px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);background:var(--white);transition:transform .12s;
+}
+.iconBtn:active{transform:scale(.92);}
+.iconBtn svg{width:12.5px;height:12.5px;stroke:var(--ink-500);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.iconBtn.del svg{stroke:#8C6A72;}
+
+/* 日期条 */
+.dateStrip{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 10px;}
+.dayChip{
+  flex:0 0 auto;min-width:50px;padding:8px 8px 7px;border-radius:13px;
+  background:var(--white);border:1px solid var(--line);text-align:center;
+  box-shadow:var(--shadow-s);transition:all .16s;
+}
+.dayChip .d1{font-size:9.5px;color:var(--ink-500);font-weight:600;}
+.dayChip .d2{font-size:15px;font-weight:700;color:var(--ink-900);margin-top:1px;}
+.dayChip .d3{font-size:8.5px;color:var(--pink-500);font-weight:600;margin-top:2px;height:10px;}
+.dayChip.active{background:linear-gradient(165deg,#D9B4BA,#CBA0A7);border-color:transparent;box-shadow:0 4px 12px rgba(140,106,114,.20);}
+.dayChip.active .d1,.dayChip.active .d2,.dayChip.active .d3{color:#fff;}
+.dayChip.today:not(.active) .d2{color:var(--pink-600);}
+
+/* 空态 */
+.empty{text-align:center;padding:26px 16px;color:var(--ink-300);}
+.empty .eIco{width:44px;height:44px;border-radius:14px;background:var(--pink-100);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+.empty .eIco svg{width:20px;height:20px;stroke:var(--pink-400);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.empty p{font-size:12.5px;line-height:1.6;}
+
+/* 分段控件 */
+.seg{display:flex;gap:5px;background:var(--pink-100);padding:4px;border-radius:13px;margin-bottom:12px;}
+.seg button{
+  flex:1;padding:8px 6px;border-radius:10px;font-size:12.5px;font-weight:600;
+  color:var(--ink-500);transition:all .16s;
+}
+.seg button.active{background:#fff;color:var(--pink-700);box-shadow:var(--shadow-s);}
+
+/* ============ 抽屉（编辑模块名） ============ */
+#scrim{
+  position:fixed;inset:0;background:rgba(61,50,56,.34);backdrop-filter:blur(2px);
+  z-index:60;opacity:0;pointer-events:none;transition:opacity .22s;
+}
+#scrim.show{opacity:1;pointer-events:auto;}
+#sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:70;
+  background:var(--white);border-radius:24px 24px 0 0;
+  padding:8px 18px calc(20px + var(--safe-b));
+  transform:translateY(102%);transition:transform .26s cubic-bezier(.32,.72,.28,1);
+  max-height:88%;overflow-y:auto;box-shadow:0 -6px 30px rgba(60,63,70,.09);
+}
+#sheet.show{transform:none;}
+.handle{width:38px;height:4px;border-radius:3px;background:var(--pink-200);margin:6px auto 14px;}
+.sheetTitle{font-size:16px;font-weight:700;margin-bottom:4px;}
+.sheetDesc{font-size:11.5px;color:var(--ink-500);margin-bottom:14px;line-height:1.55;}
+
+/* 弹层 */
+.modalWrap{
+  position:absolute;inset:0;z-index:80;display:none;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(61,50,56,.34);backdrop-filter:blur(2px);
+}
+.modalWrap.show{display:flex;}
+.modal{
+  width:100%;max-width:360px;background:var(--white);border-radius:20px;
+  padding:18px;box-shadow:var(--shadow-m);max-height:86%;overflow-y:auto;
+  animation:pop .2s cubic-bezier(.3,.8,.35,1);
+}
+@keyframes pop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+.modal h3{font-size:15.5px;font-weight:700;margin-bottom:12px;}
+.modal .foot{display:flex;gap:8px;margin-top:14px;}
+.modal .foot .btn{flex:1;}
+
+/* toast */
+#toast{
+  position:fixed;left:50%;bottom:calc(30px + var(--safe-b));transform:translate(-50%,14px);
+  z-index:200;padding:10px 17px;border-radius:999px;font-size:12.5px;font-weight:600;
+  background:rgba(61,50,56,.9);color:#fff;backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;transition:all .24s;white-space:nowrap;max-width:86vw;overflow:hidden;text-overflow:ellipsis;
+}
+#toast.show{opacity:1;transform:translate(-50%,0);}
+
+/* 统计小卡 */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.stat{background:#FAF4F5;border:1px solid var(--line);border-radius:var(--r-md);padding:12px;}
+.stat .n{font-size:20px;font-weight:700;color:var(--pink-700);line-height:1.15;}
+.stat .l{font-size:10.5px;color:var(--ink-500);margin-top:3px;font-weight:600;}
+
+/* 打卡格 */
+.calGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.calCell{aspect-ratio:1;border-radius:9px;background:var(--pink-50);border:1px solid var(--line-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--ink-500);}
+.calCell.hit{background:#D9B4BA;border-color:transparent;color:#fff;font-weight:700;}
+.calCell.today{outline:2px solid var(--pink-300);outline-offset:-2px;}
+
+/* 结果框 */
+.out{
+  background:var(--pink-50);border:1px dashed var(--pink-200);border-radius:var(--r-md);
+  padding:13px;font-size:13px;line-height:1.75;color:var(--ink-700);
+  white-space:pre-wrap;word-break:break-word;
+}
+.out b{color:var(--pink-700);}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.kv:last-child{border-bottom:none;}
+.kv span:first-child{color:var(--ink-500);flex:0 0 auto;}
+.kv span:last-child{font-weight:600;text-align:right;word-break:break-word;}
+
+.chipBar{display:flex;gap:6px;overflow-x:auto;padding:1px 2px 9px;}
+.chip{
+  flex:0 0 auto;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;
+  background:var(--white);border:1px solid var(--line);color:var(--ink-500);transition:all .16s;
+}
+.chip.active{background:linear-gradient(160deg,#D9B4BA,#B4868E);border-color:transparent;color:#fff;box-shadow:0 3px 9px rgba(140,106,114,.16);}
+
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;}
+.hint{font-size:11px;color:var(--ink-300);line-height:1.6;margin-top:6px;}
+.divider{height:1px;background:var(--line-soft);margin:13px 0;}
+.voiceBtn{width:32px;height:32px;border-radius:50%;background:linear-gradient(160deg,#D9B4BA,#B4868E);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+.voiceBtn svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.voiceBtn:active{transform:scale(.92);}
+
+.badge{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#d28a97;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--pink-50);}
+.srOnly{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+/* PWA 安装横幅 */
+#installBanner{
+  position:absolute;left:12px;right:12px;bottom:calc(12px + var(--safe-b));
+  z-index:55;display:none;
+  background:#FAF4F5;
+  border:1px solid var(--pink-200);border-radius:16px;
+  padding:12px 13px;box-shadow:0 6px 24px rgba(60,63,70,.10);
+}
+#installBanner .ibRow{display:flex;align-items:center;gap:10px;}
+#installBanner .ibTxt{flex:1;min-width:0;}
+#installBanner .ibTxt b{font-size:12.5px;color:var(--pink-700);display:block;}
+#installBanner .ibTxt span{font-size:11px;color:var(--ink-500);line-height:1.5;display:block;margin-top:2px;}
+#installBanner .ibIco{width:34px;height:34px;border-radius:11px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#D9B4BA,#CBA0A7);}
+#installBanner .ibIco svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+#installBanner .ibBtns{display:flex;gap:7px;margin-top:10px;}
+#installBanner .ibBtns .btn{flex:1;}
+.modePill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#5f8a6d;background:#f1f8f3;border:1px solid #dcecdf;border-radius:999px;padding:2px 8px;}
+</style>
+</head>
+<body>
+<div id="phone">
+
+  <div id="topbar">
+    <button id="menuBtn" aria-label="编辑模块">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="brand">
+      <h1>当然可以</h1>
+      <p id="subTitle">个人医疗从业者工作台</p>
+    </div>
+    <div id="syncPill" class="off" title="数据同步状态">
+      <span class="dot"></span><span id="syncTxt">仅本机</span>
+    </div>
+  </div>
+
+  <div id="body">
+    <nav id="rail"></nav>
+    <main id="main"></main>
+  </div>
+
+  <div id="scrim"></div>
+  <div id="sheet"></div>
+  <div class="modalWrap" id="modalWrap"></div>
+
+  <div id="installBanner">
+    <div class="ibRow">
+      <div class="ibIco">${''/* icon injected by JS */}</div>
+      <div class="ibTxt">
+        <b>安装「当然可以」到桌面</b>
+        <span>全屏运行无地址栏，支持离线使用</span>
+      </div>
+    </div>
+    <div class="ibBtns">
+      <button class="btn ghost sm" id="ibLater">暂不</button>
+      <button class="btn primary sm" id="ibBtn">一键安装</button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+"use strict";
+/* ==========================================================================
+   当然可以 · 个人医疗从业者工作台
+   单文件离线应用：localStorage 本地存储 + JSON 导入导出
+   ========================================================================== */
+
+/* ---------------- 工具函数 ---------------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const dstr = (d=new Date()) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const today = () => dstr();
+const addDays = (s,n) => { const d = new Date(s+'T00:00:00'); d.setDate(d.getDate()+n); return dstr(d); };
+const WD = ['周日','周一','周二','周三','周四','周五','周六'];
+function fmtDay(s){ const d = new Date(s+'T00:00:00'); return `${d.getMonth()+1}月${d.getDate()}日 ${WD[d.getDay()]}`; }
+function relDay(s){
+  const t = today();
+  if(s===t) return '今天';
+  if(s===addDays(t,1)) return '明天';
+  if(s===addDays(t,-1)) return '昨天';
+  const diff = Math.round((new Date(s+'T00:00:00')-new Date(t+'T00:00:00'))/864e5);
+  return diff>0 ? `${diff}天后` : `${-diff}天前`;
+}
+function nowTs(){ return Date.now(); }
+function fmtTs(ts){ const d = new Date(ts); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+let toastTimer=null;
+function toast(msg){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),1900);
+}
+
+/* ---------------- 数据层 ---------------- */
+const LS_KEY = 'dangran_keyi_workbench_v1';
+const LS_SYNC = 'dangran_keyi_sync_v1';
+const LS_TRANS = 'dangran_keyi_transhis_v1';
+
+const MODULE_DEFS = [
+  {id:'schedule', icon:'calendar',  name:'日程待办'},
+  {id:'english',  icon:'language',  name:'医学英语'},
+  {id:'clinic',   icon:'stethoscope',name:'临床医疗'},
+  {id:'research', icon:'flask',     name:'科研训练'},
+  {id:'vault',    icon:'library',   name:'思维库'}
+];
+
+const ICONS = {
+  calendar:'<rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18M8 14h3M8 17h6"/>',
+  language:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 4 5.7 4 9s-1.4 6.3-4 9c-2.6-2.7-4-5.7-4-9s1.4-6.3 4-9z"/>',
+  stethoscope:'<path d="M5 3v5a4 4 0 0 0 8 0V3"/><path d="M9 16v-4"/><path d="M9 16a4 4 0 0 0 8 0v-2"/><circle cx="18" cy="11" r="2.2"/>',
+  flask:'<path d="M9.5 3v6.2L4.6 17.4A2 2 0 0 0 6.3 20.5h11.4a2 2 0 0 0 1.7-3.1L14.5 9.2V3"/><path d="M8 3h8M7.5 14h9"/>',
+  library:'<path d="M4 5.5A2 2 0 0 1 6 3.5h4v17H6a2 2 0 0 1-2-2z"/><path d="M14 3.5h4a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-4z"/><path d="M10 3.5v17"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  trash:'<path d="M4 7h16M9 7V5h6v2M6.5 7l.8 12.2a2 2 0 0 0 2 1.8h5.4a2 2 0 0 0 2-1.8L17.5 7"/>',
+  edit:'<path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-3.6-3.6"/>',
+  play:'<path d="M7 4.5l12 7.5-12 7.5z"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/>',
+  bell:'<path d="M6 10a6 6 0 1 1 12 0c0 4 1.6 5.4 1.6 5.4H4.4S6 14 6 10z"/><path d="M10 19a2 2 0 0 0 4 0"/>',
+  file:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h4"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',
+  download:'<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M4.5 19.5h15"/>',
+  upload:'<path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M4.5 19.5h15"/>',
+  grid:'<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>',
+  refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/>',
+  tag:'<path d="M3.5 11.6V4.5h7.1l9 9-7.1 7.1z"/><circle cx="7.5" cy="8.5" r="1.3"/>',
+  plus2:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+  heart:'<path d="M12 20s-7-4.4-7-9.4A4.1 4.1 0 0 1 12 7.9 4.1 4.1 0 0 1 19 10.6c0 5-7 9.4-7 9.4z"/>',
+  pill:'<rect x="2.5" y="9" width="19" height="6.5" rx="3.2" transform="rotate(-45 12 12)"/><path d="M8.5 8.5l7 7"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  note:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 9h6M9 13h6M9 17h4"/>'
+};
+const svg = (n,cls) => `<svg class="${cls||''}" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]||ICONS.grid}</svg>`;
+
+/* ---- 演示数据 ---- */
+function demoData(){
+  const t = today();
+  const y = addDays(t,-1), tm = addDays(t,1);
+  return {
+    v:1,
+    modules: MODULE_DEFS.map(m=>({...m})),
+    schedule:[
+      {id:uid(),title:'07:30 呼吸内科查房',date:t,note:'重点关注 3 床咳嗽咳痰情况，昨日体温 37.8℃。',time:'07:30',done:false,ts:nowTs()},
+      {id:uid(),title:'整理 5 床出院小结',date:t,note:'出院带药：氨氯地平 5mg qd。',time:'11:00',done:false,ts:nowTs()-9e5},
+      {id:uid(),title:'下午门诊跟诊',date:t,note:'',time:'14:00',done:true,ts:nowTs()-18e5},
+      {id:uid(),title:'完成夜班交班记录',date:y,note:'',time:'21:00',done:false,ts:nowTs()-8e7},
+      {id:uid(),title:'复习心力衰竭诊疗指南',date:tm,note:'重点：射血分数降低型 HFrEF 四联疗法。',time:'20:00',done:false,ts:nowTs()-3e6}
+    ],
+    words:[
+      {id:uid(),word:'dyspnea',pos:'n.',meaning:'呼吸困难；气促',scene:'内科',done:false,ts:nowTs()},
+      {id:uid(),word:'hypertension',pos:'n.',meaning:'高血压',scene:'内科',done:true,ts:nowTs()-2e6},
+      {id:uid(),word:'auscultation',pos:'n.',meaning:'听诊（法）',scene:'全科',done:false,ts:nowTs()-4e6},
+      {id:uid(),word:'differential diagnosis',pos:'n.',meaning:'鉴别诊断',scene:'全科',done:false,ts:nowTs()-6e6},
+      {id:uid(),word:'prognosis',pos:'n.',meaning:'预后',scene:'全科',done:false,ts:nowTs()-7e6},
+      {id:uid(),word:'suture',pos:'n./v.',meaning:'缝合；缝线',scene:'外科',done:false,ts:nowTs()-8e6},
+      {id:uid(),word:'triage',pos:'n.',meaning:'分诊；伤员分类',scene:'急诊',done:false,ts:nowTs()-9e6},
+      {id:uid(),word:'contraindication',pos:'n.',meaning:'禁忌症',scene:'用药相关',done:false,ts:nowTs()-1e7},
+      {id:uid(),word:'dosage',pos:'n.',meaning:'剂量；用量',scene:'用药相关',done:true,ts:nowTs()-1.1e7},
+      {id:uid(),word:'myocardial infarction',pos:'n.',meaning:'心肌梗死',scene:'内科',done:false,ts:nowTs()-1.2e7},
+      {id:uid(),word:'appendectomy',pos:'n.',meaning:'阑尾切除术',scene:'外科',done:false,ts:nowTs()-1.3e7},
+      {id:uid(),word:'cardiopulmonary resuscitation',pos:'n.',meaning:'心肺复苏（CPR）',scene:'急诊',done:false,ts:nowTs()-1.4e7}
+    ],
+    dialogues:[
+      {id:uid(),title:'门诊接诊问诊',scene:'医患沟通',builtin:true,lines:[
+        {en:"What brings you in today?",zh:"您今天哪里不舒服？"},
+        {en:"I've had a sore throat and a mild fever for three days.",zh:"我嗓子疼、低烧三天了。"},
+        {en:"Does it hurt when you swallow? Any cough?",zh:"吞咽的时候疼吗？有没有咳嗽？"},
+        {en:"Yes, it hurts a lot when I swallow. No cough.",zh:"是的，吞咽时很疼，不咳嗽。"},
+        {en:"Let me examine your throat. Open your mouth and say 'ah'.",zh:"我检查一下您的咽喉，张嘴说“啊”。"},
+        {en:"Your pharynx is red and swollen. It looks like acute pharyngitis.",zh:"咽部红肿，看起来像是急性咽炎。"},
+        {en:"I'll prescribe an anti-inflammatory lozenge. Gargle with warm salt water.",zh:"我给您开含片消炎，用温盐水漱口。"},
+        {en:"Come back if the fever exceeds 38.5°C or lasts more than three days.",zh:"如果体温超过 38.5℃，或发热超过三天，请复诊。"}
+      ]},
+      {id:uid(),title:'晨间查房',scene:'查房',builtin:true,lines:[
+        {en:"Good morning. How are you feeling today?",zh:"早上好，今天感觉怎么样？"},
+        {en:"Much better. The chest pain has eased.",zh:"好多了，胸痛减轻了。"},
+        {en:"Any shortness of breath when lying flat?",zh:"平躺时会觉得气短吗？"},
+        {en:"A little, but much less than before.",zh:"有一点，但比之前轻多了。"},
+        {en:"Your temperature is 36.8°C and your lung sounds are clearer today.",zh:"体温 36.8℃，今天肺部听诊也比昨天清晰。"},
+        {en:"We'll reduce the diuretic dose and keep the antibiotic for two more days.",zh:"我们减少利尿剂剂量，抗生素再用两天。"},
+        {en:"Please keep a record of how much water you drink and how much you urinate.",zh:"请记录一下入量和尿量。"}
+      ]},
+      {id:uid(),title:'医嘱告知与宣教',scene:'医嘱告知',builtin:true,lines:[
+        {en:"I'm going to explain your medication plan.",zh:"我来给您说明一下用药方案。"},
+        {en:"Take this tablet once daily after breakfast, 5 mg each time.",zh:"这种药每天早餐后吃一次，每次 5 毫克。"},
+        {en:"Do not skip a dose even if you feel fine.",zh:"即使感觉良好也不要自行停药。"},
+        {en:"Avoid grapefruit juice, as it interacts with this drug.",zh:"避免饮用西柚汁，会与这个药产生相互作用。"},
+        {en:"Watch for swollen ankles or a dry cough, and report them to us.",zh:"注意脚踝水肿或干咳，出现要及时告诉我们。"},
+        {en:"Do you have any questions about the plan?",zh:"关于这个方案还有疑问吗？"}
+      ]},
+      {id:uid(),title:'术前知情同意沟通',scene:'术前告知',builtin:true,lines:[
+        {en:"I'd like to discuss the procedure with you.",zh:"我想和您谈一下这个操作。"},
+        {en:"It's a routine examination that takes about fifteen minutes.",zh:"这是一项常规检查，大约需要十五分钟。"},
+        {en:"You may feel mild discomfort, but it is usually well tolerated.",zh:"您可能会感到轻微不适，但通常都能耐受。"},
+        {en:"The main risks are bleeding and infection, both uncommon.",zh:"主要风险是出血和感染，但都比较少见。"},
+        {en:"You have the right to refuse at any time.",zh:"您有权在任何时候拒绝。"},
+        {en:"If you agree, please sign this consent form.",zh:"如果您同意，请在这份知情同意书上签字。"}
+      ]}
+    ],
+    drugs:[
+      {id:uid(),name:'阿莫西林',alias:'Amoxicillin',cls:'青霉素类抗生素',adult:'口服 0.5 g，每 6–8 小时一次',child:'20–40 mg/kg/日，分 3 次',spec:'0.25 g / 胶囊',contra:'青霉素过敏者禁用',caution:'用药前须做青霉素皮试；传染性单核细胞增多症慎用',ts:nowTs()},
+      {id:uid(),name:'氨氯地平',alias:'Amlodipine',cls:'钙通道阻滞剂',adult:'口服 5 mg，每日 1 次',child:'儿童安全性未确立',spec:'5 mg / 片',contra:'对二氢吡啶类过敏者禁用',caution:'避免与西柚汁同服；肝功能不全者减量起始',ts:nowTs()-3e5},
+      {id:uid(),name:'呋塞米',alias:'Furosemide',cls:'袢利尿剂',adult:'口服 20–40 mg，每日 1–2 次',child:'1–2 mg/kg/次，按需调整',spec:'20 mg / 片',contra:'无尿、严重电解质紊乱者禁用',caution:'定期监测血钾、肾功能；注意记录出入量',ts:nowTs()-6e5}
+    ],
+    orders:[
+      {id:uid(),name:'I 级护理常规',body:'I 级护理常规\n持续心电监护 24 h\n吸氧 2 L/min  必要时\n测体温、脉搏、呼吸 q4h\n记 24 h 出入量',ts:nowTs()},
+      {id:uid(),name:'Ⅱ型糖尿病基础医嘱',body:'糖尿病饮食，称重饮食\n监测空腹及餐后 2 h 血糖\n二甲双胍 0.5 g  po  bid\n完善糖化血红蛋白、尿微量白蛋白',ts:nowTs()-4e5},
+      {id:uid(),name:'社区获得性肺炎医嘱',body:'呼吸内科护理常规\n阿莫西林克拉维酸钾 1.2 g  ivgtt  q8h\n氨溴索 30 mg  ivgtt  bid\n退热对症：体温 >38.5℃ 予布洛芬\n完善胸部 CT、血常规、CRP',ts:nowTs()-9e5}
+    ],
+    dxflows:[
+      {id:uid(),name:'胸痛诊断思路',cat:'心血管',body:'① 首先排除致命性胸痛：急性冠脉综合征、主动脉夹层、肺栓塞、张力性气胸。\n② 问诊：起病诱因、性质、部位、放射、持续时间、伴随症状（出汗、气促、晕厥）。\n③ 立即完善 12 导联心电图 ＋ 肌钙蛋白（0 h / 1 h）。\n④ 查体：双上肢血压、颈静脉、肺部听诊、下肢水肿。\n⑤ 危险分层，按结果决定溶栓 / 介入 / 收入 CCU。',ts:nowTs()},
+      {id:uid(),name:'发热待查诊断思路',cat:'感染/全科',body:'① 明确热型与病程（<3 周 / >3 周）。\n② 感染性：细菌培养、CRP、PCT、影像学。\n③ 非感染性：风湿免疫（ANA、ANCA）、肿瘤（LDH、影像）、药物热。\n④ 反复询问用药史、旅行史、动物接触史。\n⑤ 不明原因发热超过 3 周按 FUO 流程系统筛查。',ts:nowTs()-2e5}
+    ],
+    refs:[
+      {id:uid(),title:'N Engl J Med · SGLT2 抑制剂在 HFrEF 中的应用',cat:'心血管',authors:'Packer M, et al.',year:'2021',abstract:'本文综述了钠-葡萄糖共转运蛋白 2 抑制剂在射血分数降低型心力衰竭中的获益机制与循证证据。纳入的多项 RCT 显示，无论是否合并糖尿病，SGLT2i 均可显著降低心血管死亡与心衰住院复合终点（HR 0.75, 95% CI 0.70–0.81）。',highlight:'',note:'可将其列为 HFrEF 一线四联疗法的组成部分。',ts:nowTs()},
+      {id:uid(),title:'Lancet · 社区获得性肺炎抗菌策略',cat:'呼吸内科',authors:'Metlay JP, et al.',year:'2019',abstract:'比较了 β-内酰胺单药与大环内酯联合方案在门诊 CAP 患者中的疗效，重症评分（CURB-65 ≥2）患者联合治疗获益更明显。',highlight:'老年患者联合治疗可降低 30 天再住院率。',note:'',ts:nowTs()-5e5}
+    ],
+    vault:[
+      {id:uid(),title:'室性早搏的良恶性判断要点',cat:'心内科',tags:['心电图','心律失常','临床'],body:'① 负荷：>10% 或 >10000 次/24 h 视为高负荷。\n② 形态：多形性、成对、短阵连发提示风险高。\n③ 起源：右室流出道多良性；左室分支起源需警惕。\n④ 伴随症状：晕厥、黑矇、运动时加重 → 需进一步评估。\n⑤ 处理：低负荷无症状可观察，高负荷考虑射频消融。',ts:nowTs()},
+      {id:uid(),title:'常用静脉输液配制速记',cat:'临床技能',tags:['输液','急救','速查'],body:'• 0.9% NaCl 500 mL ＋ 10% KCl 10 mL（约 13.4 mmol）\n• 补钾速度 ≤ 20 mmol/h，浓度 ≤ 40 mmol/L（外周静脉）\n• 多巴胺 体重(kg)×3 mg 稀释至 50 mL → 1 mL/h = 1 μg/kg/min\n• 去甲肾上腺素 0.1 μg/kg/min 起始，按血压滴定',ts:nowTs()-1e6},
+      {id:uid(),title:'医学英语词根速记',cat:'医学英语',tags:['英语','词汇','学习'],body:'• cardi- 心  → cardiovascular\n• pneum- 肺/气 → pneumonia\n• hepato- 肝 → hepatitis\n• nephr- 肾 → nephritis\n• -itis 炎症 → appendicitis\n• -ectomy 切除术 → gastrectomy\n• -algia 疼痛 → cephalalgia',ts:nowTs()-2e6}
+    ],
+    meta:{
+      dict:{}, // 单词打卡 {word:ts}
+      stats:{}, // 打卡 {date:{words:n, dialogues:n}}
+      syncOn:false,
+      moduleNames:{}
+    }
+  };
+}
+
+let DB = null;
+
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const p = JSON.parse(raw);
+      const base = demoData();
+      DB = Object.assign(base, p);
+      DB.meta = Object.assign(base.meta, p.meta||{});
+      ['schedule','words','dialogues','drugs','orders','dxflows','refs','vault'].forEach(k=>{ if(!Array.isArray(DB[k])) DB[k]=base[k]; });
+      if(!Array.isArray(DB.modules) || DB.modules.length!==5) DB.modules = base.modules;
+      return;
+    }
+  }catch(e){ console.warn('load fail',e); }
+  DB = demoData();
+  save();
+}
+
+let saveTimer=null, saveFlash=null;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify(DB));
+      flashSaved();
+    }catch(e){ toast('保存失败：存储空间不足'); }
+  },120);
+}
+function flashSaved(){
+  const p = $('#syncPill'); p.style.transition='none'; p.style.transform='scale(1.1)';
+  setTimeout(()=>{ p.style.transition='all .25s'; p.style.transform=''; },60);
+}
+function saveSync(){
+  try{ localStorage.setItem(LS_SYNC, JSON.stringify(DB.meta.syncOn)); }catch(e){}
+}
+function getSync(){
+  try{ return localStorage.getItem(LS_SYNC)==='true'; }catch(e){ return false; }
+}
+function setSync(on){
+  DB.meta.syncOn = on; saveSync(); renderSyncPill();
+  toast(on ? '已连接 · 设备同步已开启' : '已断开 · 仅保存在本机');
+}
+
+function renderSyncPill(){
+  const on = getSync();
+  const p = $('#syncPill');
+  p.className = on ? 'on' : 'off';
+  $('#syncTxt').textContent = on ? '已同步' : '仅本机';
+  p.title = on
+    ? '设备已连接：数据在本机保存，同时标记为可同步状态'
+    : '设备未连接：数据仅保存在当前设备浏览器中';
+}
+
+/* ---- 自动顺延：昨天未完成 → 今天 ---- */
+function rollover(){
+  const t = today();
+  let moved = 0;
+  DB.schedule.forEach(it=>{
+    if(!it.done && it.date < t){
+      it.date = t;
+      it.carried = (it.carried||0)+1;
+      moved++;
+    }
+  });
+  // 清理超过 90 天的已完成记录以外的历史（保留，仅提示）
+  if(moved){ save(); }
+  return moved;
+}
+
+/* ---------------- 导航 ---------------- */
+let currentMod = 'schedule';
+function renderRail(){
+  const rail = $('#rail');
+  rail.innerHTML = DB.modules.map(m=>`
+    <button class="navItem${m.id===currentMod?' active':''}" data-mod="${m.id}" data-id="${m.id}">
+      <span class="editDot"></span>
+      <span class="ico">${svg(m.icon)}</span>
+      <span class="nm">${esc(m.name)}</span>
+    </button>`).join('') + `<div id="railSpacer"></div><div id="railHint">长按改模块名<br>拖拽可排序</div>`;
+  bindRail();
+}
+function bindRail(){
+  let pressTimer=null, longPressed=false, dragEl=null, startY=0;
+
+  $$('#rail .navItem').forEach(el=>{
+    const id = el.dataset.mod;
+
+    const start = e=>{
+      longPressed=false;
+      const pt = e.touches?e.touches[0]:e;
+      startY = pt.clientY;
+      pressTimer = setTimeout(()=>{
+        longPressed = true;
+        if(navigator.vibrate) try{navigator.vibrate(18);}catch(_){}
+        openModEditor(id);
+      },520);
+    };
+    const move = e=>{
+      const pt = e.touches?e.touches[0]:e;
+      if(Math.abs(pt.clientY-startY)>10 && !longPressed) clearTimeout(pressTimer);
+    };
+    const end = e=>{
+      clearTimeout(pressTimer);
+      if(longPressed){ longPressed=false; return; }
+      const pt = e.changedTouches?e.changedTouches[0]:e;
+      if(Math.abs(pt.clientY-startY)>10) return;
+      go(id);
+    };
+    el.addEventListener('touchstart',start,{passive:true});
+    el.addEventListener('touchmove',move,{passive:true});
+    el.addEventListener('touchend',end);
+    el.addEventListener('mousedown',start);
+    el.addEventListener('mouseup',end);
+
+    /* 拖拽排序 */
+    el.addEventListener('dragstart',ev=>{
+      dragEl=el; el.classList.add('dragging');
+      try{ ev.dataTransfer.setData('text/plain',id); ev.dataTransfer.effectAllowed='move'; }catch(_){}
+    });
+    el.addEventListener('dragend',()=>{
+      el.classList.remove('dragging');
+      $$('#rail .navItem').forEach(n=>n.classList.remove('dropMark'));
+      dragEl=null;
+    });
+    el.addEventListener('dragover',ev=>{ ev.preventDefault(); if(dragEl&&dragEl!==el) el.classList.add('dropMark'); });
+    el.addEventListener('dragleave',()=>el.classList.remove('dropMark'));
+    el.addEventListener('drop',ev=>{
+      ev.preventDefault(); el.classList.remove('dropMark');
+      if(!dragEl||dragEl===el) return;
+      const from = DB.modules.findIndex(m=>m.id===dragEl.dataset.mod);
+      const to = DB.modules.findIndex(m=>m.id===el.dataset.mod);
+      if(from<0||to<0) return;
+      const [mv] = DB.modules.splice(from,1);
+      DB.modules.splice(to,0,mv);
+      save(); renderRail();
+      toast('模块顺序已更新');
+    });
+
+    /* 触摸拖拽（移动端） */
+    el.draggable = true;
+  });
+
+  /* 长按拖拽排序（触摸端）：先长按 300ms 进入排序模式 */
+  let sortTimer=null, sorting=false, ghost=null, srcEl=null;
+  $$('#rail .navItem').forEach(el=>{
+    el.addEventListener('touchstart',e=>{
+      srcEl=el;
+      sortTimer=setTimeout(()=>{
+        sorting=true;
+        el.classList.add('dragging');
+        if(navigator.vibrate) try{navigator.vibrate(15);}catch(_){}
+      },330);
+    },{passive:true});
+    el.addEventListener('touchmove',e=>{
+      if(!sorting){ clearTimeout(sortTimer); return; }
+      e.preventDefault();
+      const pt=e.touches[0];
+      const target = document.elementFromPoint(pt.clientX,pt.clientY);
+      const nav = target && target.closest ? target.closest('.navItem') : null;
+      $$('#rail .navItem').forEach(n=>n.classList.remove('dropMark'));
+      if(nav && nav!==el) nav.classList.add('dropMark');
+    },{passive:false});
+    el.addEventListener('touchend',e=>{
+      clearTimeout(sortTimer);
+      if(!sorting){ srcEl=null; return; }
+      sorting=false; el.classList.remove('dragging');
+      const marked = $('#rail .navItem.dropMark');
+      $$('#rail .navItem').forEach(n=>n.classList.remove('dropMark'));
+      if(marked && marked!==el){
+        const from = DB.modules.findIndex(m=>m.id===el.dataset.mod);
+        const to = DB.modules.findIndex(m=>m.id===marked.dataset.mod);
+        if(from>-1&&to>-1){
+          const [mv]=DB.modules.splice(from,1);
+          DB.modules.splice(to,0,mv);
+          save(); renderRail(); toast('模块顺序已更新');
+        }
+      }
+      srcEl=null;
+    });
+  });
+}
+
+function buildPages(){
+  const main = $('#main');
+  main.innerHTML = `
+    <section class="page" id="p-schedule"></section>
+    <section class="page" id="p-english"></section>
+    <section class="page" id="p-clinic"></section>
+    <section class="page" id="p-research"></section>
+    <section class="page" id="p-vault"></section>`;
+}
+function go(id){
+  if(!MODULE_DEFS.find(m=>m.id===id)) id = DB.modules[0].id;
+  currentMod = id;
+  $$('#rail .navItem').forEach(n=>n.classList.toggle('active', n.dataset.mod===id));
+  $$('.page').forEach(p=>p.classList.toggle('active', p.id==='p-'+id));
+  const m = DB.modules.find(x=>x.id===id);
+  $('#subTitle').textContent = m ? m.name : '工作台';
+  $('#main').scrollTop = 0;
+  renderPage(id);
+}
+function renderPage(id){
+  if(id==='schedule') renderSchedule();
+  else if(id==='english') renderEnglish();
+  else if(id==='clinic') renderClinic();
+  else if(id==='research') renderResearch();
+  else renderVault();
+}
+
+/* ---------------- 弹层 ---------------- */
+function openModal(html){
+  const w = $('#modalWrap');
+  w.innerHTML = `<div class="modal">${html}</div>`;
+  w.classList.add('show');
+  return w;
+}
+function closeModal(){ $('#modalWrap').classList.remove('show'); $('#modalWrap').innerHTML=''; }
+$('#modalWrap').addEventListener('click', e=>{ if(e.target.id==='modalWrap') closeModal(); });
+
+function openSheet(html){
+  $('#sheet').innerHTML = `<div class="handle"></div>${html}`;
+  $('#sheet').classList.add('show'); $('#scrim').classList.add('show');
+}
+function closeSheet(){ $('#sheet').classList.remove('show'); $('#scrim').classList.remove('show'); }
+$('#scrim').addEventListener('click', closeSheet);
+
+/* 编辑模块名 */
+function openModEditor(id){
+  const m = DB.modules.find(x=>x.id===id); if(!m) return;
+  openSheet(`
+    <div class="sheetTitle">修改模块名称</div>
+    <div class="sheetDesc">输入新的名称后保存。留空则恢复默认名称。</div>
+    <div class="field"><label>模块名称</label>
+      <input class="inp" id="modNameInp" value="${esc(m.name)}" maxlength="12" placeholder="${esc(MODULE_DEFS.find(d=>d.id===id).name)}">
+    </div>
+    <div class="hint">提示：长按左侧任意模块图标即可修改它的名字；按住并上下拖动可以调整顺序。</div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn ghost" id="modReset">恢复默认</button>
+      <button class="btn primary" id="modSave">保存名称</button>
+    </div>`);
+  const inp = $('#modNameInp');
+  setTimeout(()=>{ inp.focus(); inp.select(); },220);
+  $('#modReset').onclick = ()=>{
+    m.name = MODULE_DEFS.find(d=>d.id===id).name;
+    save(); renderRail(); closeSheet(); go(currentMod); toast('已恢复默认名称');
+  };
+  $('#modSave').onclick = ()=>{
+    const v = inp.value.trim();
+    m.name = v || MODULE_DEFS.find(d=>d.id===id).name;
+    save(); renderRail(); closeSheet(); go(currentMod); toast('模块名称已保存');
+  };
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') $('#modSave').click(); });
+}
+
+/* ==========================================================================
+   模块一：日程待办
+   ========================================================================== */
+let schedDate = today();
+function renderSchedule(){
+  const t = today();
+  // 日期条：过去 6 天 ~ 未来 7 天
+  const days=[]; for(let i=-6;i<=7;i++) days.push(addDays(t,i));
+  const list = DB.schedule.filter(x=>x.date===schedDate).sort((a,b)=>{
+    if(a.done!==b.done) return a.done?1:-1;
+    const ta=a.time||'99:99', tb=b.time||'99:99';
+    if(ta!==tb) return ta<tb?-1:1;
+    return (a.ts||0)-(b.ts||0);
+  });
+  const pending = list.filter(x=>!x.done).length;
+  const undoneAll = DB.schedule.filter(x=>!x.done).length;
+  const doneAll = DB.schedule.filter(x=>x.done).length;
+
+  $('#p-schedule').innerHTML = `
+    <div class="secHead">
+      <div><h2>日程待办</h2><p>${fmtDay(schedDate)} · ${relDay(schedDate)}</p></div>
+      <button class="btn primary sm" id="addTodo">${svg('plus')}新建</button>
+    </div>
+
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="stat"><div class="n">${DB.schedule.length}</div><div class="l">全部待办</div></div>
+      <div class="stat"><div class="n">${undoneAll}</div><div class="l">未完成</div></div>
+    </div>
+
+    <div class="dateStrip" id="dateStrip">
+      ${days.map(d=>{
+        const dt = new Date(d+'T00:00:00');
+        const n = DB.schedule.filter(x=>x.date===d&&!x.done).length;
+        return `<button class="dayChip${d===schedDate?' active':''}${d===t?' today':''}" data-d="${d}">
+          <div class="d1">${WD[dt.getDay()]}</div>
+          <div class="d2">${dt.getDate()}</div>
+          <div class="d3">${n?n+'项':''}</div>
+        </button>`;
+      }).join('')}
+    </div>
+
+    ${list.length ? `<div id="todoList">${list.map(todoHTML).join('')}</div>` : `
+      <div class="empty"><div class="eIco">${svg('calendar')}</div>
+        <p>${relDay(schedDate)}还没有待办<br>点击右上角「新建」添加一条</p></div>`}
+
+    <div class="card tint" style="margin-top:14px">
+      <div style="font-size:12.5px;font-weight:700;margin-bottom:8px;color:var(--pink-700)">数据与备份</div>
+      <div class="row" style="margin-bottom:8px">
+        <button class="btn ghost sm" id="expBtn">${svg('download')}导出备份</button>
+        <button class="btn ghost sm" id="impBtn">${svg('upload')}导入恢复</button>
+      </div>
+      <div class="row">
+        <button class="btn ghost sm" id="syncBtn">${svg('refresh')}${getSync()?'断开设备':'连接设备'}</button>
+        <button class="btn danger sm" id="clearBtn">${svg('trash')}清空演示数据</button>
+      </div>
+      <div class="hint">共 ${DB.schedule.length} 条待办 · ${DB.words.length} 个单词 · ${DB.vault.length} 条素材。数据自动保存在本机浏览器，关闭页面不会丢失。</div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:12.5px;font-weight:700;margin-bottom:8px;color:var(--ink-700)">历史日程 · 全部</div>
+      <div id="allHistory" style="max-height:230px;overflow-y:auto"></div>
+    </div>`;
+
+  $('#addTodo').onclick = ()=>todoEditor(null);
+  $$('#dateStrip .dayChip').forEach(b=>b.onclick=()=>{ schedDate=b.dataset.d; renderSchedule(); });
+  const act = $('#dateStrip .dayChip.active');
+  if(act) setTimeout(()=>act.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}),60);
+  bindTodoList();
+  renderAllHistory();
+  bindBackup();
+
+  if(undoneAll > 0 && schedDate===t && !renderSchedule.__carryToast){
+    const carried = DB.schedule.filter(x=>x.date===t && x.carried).length;
+    if(carried){ renderSchedule.__carryToast = true; setTimeout(()=>toast(`已自动顺延 ${carried} 条历史未完成待办到今天`),400); }
+  }
+}
+
+function todoHTML(it){
+  return `<div class="item${it.done?' done':''}" data-id="${it.id}" data-ts="${it.ts||0}">
+    <div class="itemHead">
+      <div class="grip" data-grip><i></i><i></i><i></i></div>
+      <button class="cb${it.done?' on':''}" data-check>${svg('check')}</button>
+      <div class="itemMb" data-open>
+        <div class="itemTitle">${esc(it.title)}</div>
+        ${it.note?`<div class="itemSub">${esc(it.note)}</div>`:''}
+        <div class="itemMeta">
+          ${it.time?`<span class="tag">${svg('clock')}${esc(it.time)}</span>`:''}
+          ${it.date!==today()?`<span class="tag gray">${relDay(it.date)} ${it.date.slice(5)}</span>`:''}
+          ${it.carried?`<span class="tag warn">已顺延 ${it.carried} 次</span>`:''}
+          ${it.done?`<span class="tag ok">已完成</span>`:''}
+        </div>
+      </div>
+      <button class="iconBtn del" data-del>${svg('trash')}</button>
+    </div>
+  </div>`;
+}
+
+function bindTodoList(){
+  const box = $('#todoList');
+  if(box) bindTodoItems(box);
+
+  /* 触摸拖拽排序 */
+  let drag = null, srcEl=null;
+  $$('#todoList .item').forEach(el=>{
+    el.draggable = true;
+    el.addEventListener('dragstart',()=>{ srcEl=el; el.classList.add('draggingItem'); });
+    el.addEventListener('dragend',()=>{ el.classList.remove('draggingItem'); $$('#todoList .item').forEach(n=>n.classList.remove('dropTarget')); srcEl=null; });
+    el.addEventListener('dragover',e=>{ e.preventDefault(); if(srcEl&&srcEl!==el) el.classList.add('dropTarget'); });
+    el.addEventListener('dragleave',()=>el.classList.remove('dropTarget'));
+    el.addEventListener('drop',e=>{ e.preventDefault(); el.classList.remove('dropTarget'); reorder(srcEl,el); });
+  });
+
+  let lt=null, sorting=false;
+  $$('#todoList .item').forEach(el=>{
+    const grip = el.querySelector('[data-grip]');
+    const begin = ()=>{ lt=setTimeout(()=>{ sorting=true; el.classList.add('draggingItem'); if(navigator.vibrate) try{navigator.vibrate(14);}catch(_){} },300); };
+    grip.addEventListener('touchstart',begin,{passive:true});
+    grip.addEventListener('mousedown',begin);
+    const cancel = ()=>{ clearTimeout(lt); if(sorting){ sorting=false; el.classList.remove('draggingItem'); } };
+    grip.addEventListener('touchend',cancel);
+    grip.addEventListener('mouseup',cancel);
+    el.addEventListener('touchmove',e=>{
+      if(!sorting){ clearTimeout(lt); return; }
+      e.preventDefault();
+      const pt=e.touches[0];
+      const tar = document.elementFromPoint(pt.clientX,pt.clientY);
+      const it = tar && tar.closest ? tar.closest('#todoList .item') : null;
+      $$('#todoList .item').forEach(n=>n.classList.remove('dropTarget'));
+      if(it&&it!==el) it.classList.add('dropTarget');
+    },{passive:false});
+    el.addEventListener('touchend',()=>{
+      clearTimeout(lt);
+      if(!sorting) return;
+      sorting=false; el.classList.remove('draggingItem');
+      const tgt = $('#todoList .item.dropTarget');
+      $$('#todoList .item').forEach(n=>n.classList.remove('dropTarget'));
+      if(tgt&&tgt!==el) reorder(el,tgt);
+    });
+  });
+}
+function reorder(srcEl,tgtEl){
+  if(!srcEl||!tgtEl||srcEl===tgtEl) return;
+  const a = DB.schedule.find(x=>x.id===srcEl.dataset.id);
+  const b = DB.schedule.find(x=>x.id===tgtEl.dataset.id);
+  if(!a||!b) return;
+  const ai = DB.schedule.indexOf(a), bi = DB.schedule.indexOf(b);
+  DB.schedule.splice(ai,1); DB.schedule.splice(bi,0,a);
+  a.ts = nowTs(); b.ts = b.ts||nowTs();
+  save(); renderSchedule(); toast('顺序已调整');
+}
+function bindTodoItems(box){
+  $$('.item',box).forEach(el=>{
+    const it = DB.schedule.find(x=>x.id===el.dataset.id); if(!it) return;
+    el.querySelector('[data-check]').onclick = e=>{
+      e.stopPropagation();
+      it.done = !it.done;
+      if(it.done) it.doneAt = nowTs();
+      save(); renderSchedule();
+      if(it.done) toast('已完成 · 划掉一条');
+    };
+    el.querySelector('[data-del]').onclick = e=>{
+      e.stopPropagation();
+      DB.schedule = DB.schedule.filter(x=>x.id!==it.id);
+      save(); renderSchedule(); toast('已删除');
+    };
+    const opener = el.querySelector('[data-open]');
+    opener.onclick = ()=>todoEditor(it);
+  });
+}
+function renderAllHistory(){
+  const box = $('#allHistory'); if(!box) return;
+  const groups = {};
+  DB.schedule.forEach(x=>{ (groups[x.date]=groups[x.date]||[]).push(x); });
+  const dates = Object.keys(groups).sort((a,b)=>a<b?1:-1).slice(0,20);
+  if(!dates.length){ box.innerHTML = `<div class="hint">暂无历史记录</div>`; return; }
+  box.innerHTML = dates.map(d=>{
+    const arr = groups[d].sort((a,b)=>(a.time||'99:99')<(b.time||'99:99')?-1:1);
+    return `<div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <span style="font-size:12px;font-weight:700;color:${d===today()?'var(--pink-700)':'var(--ink-700)'}">${fmtDay(d)}</span>
+        <span class="tag gray">${arr.filter(x=>!x.done).length}/${arr.length} 未完成</span>
+      </div>
+      ${arr.map(x=>`<div style="display:flex;gap:7px;align-items:flex-start;padding:5px 0;border-bottom:1px dashed var(--line-soft)">
+        <span style="width:5px;height:5px;border-radius:50%;background:${x.done?'var(--ok)':'var(--pink-400)'};margin-top:7px;flex:0 0 auto"></span>
+        <span style="flex:1;font-size:12.5px;${x.done?'color:var(--ink-300);text-decoration:line-through':''}">${esc(x.title)}${x.time?` <span style="color:var(--ink-300);font-size:11px">${esc(x.time)}</span>`:''}</span>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function todoEditor(it){
+  const isNew = !it;
+  const d = it || {title:'',date:schedDate,note:'',time:''};
+  openSheet(`
+    <div class="sheetTitle">${isNew?'新建待办':'编辑待办'}</div>
+    <div class="sheetDesc">${isNew?'记录一条日程或待办，可设置日期、时间与备注。':'修改后自动保存。'}</div>
+    <div class="field"><label>待办内容</label>
+      <input class="inp" id="tdTitle" value="${esc(d.title)}" placeholder="例如：07:30 呼吸内科查房" maxlength="80"></div>
+    <div class="field"><label>所属日期</label>
+      <input class="inp" type="date" id="tdDate" value="${d.date||today()}"></div>
+    <div class="field"><label>提醒时间（可选）</label>
+      <input class="inp" type="time" id="tdTime" value="${d.time||''}"></div>
+    <div class="field"><label>备注（可选）</label>
+      <textarea class="inp" id="tdNote" placeholder="补充说明、患者信息、要点提醒…" rows="3">${esc(d.note||'')}</textarea></div>
+    <div class="hint">未勾选完成的待办，次日打开时会自动顺延到当天。</div>
+    <div class="row" style="margin-top:14px">
+      ${isNew?'':`<button class="btn ghost" id="tdDel">${svg('trash')}删除</button>`}
+      <button class="btn primary" id="tdSave">保存</button>
+    </div>`);
+  setTimeout(()=>$('#tdTitle').focus(),220);
+  $('#tdSave').onclick = ()=>{
+    const title = $('#tdTitle').value.trim();
+    if(!title){ toast('请填写待办内容'); return; }
+    const time = $('#tdTime').value;
+    const payload = { title, date:$('#tdDate').value||today(), note:$('#tdNote').value.trim(), time };
+    if(isNew){
+      DB.schedule.push({ id:uid(), ...payload, done:false, ts:nowTs() });
+    }else{
+      Object.assign(it, payload); it.ts = it.ts||nowTs();
+    }
+    save(); closeSheet(); schedDate = payload.date; renderSchedule();
+    toast(isNew?'已添加待办':'已保存');
+    if(time) requestNotify(title, payload.date, time);
+  };
+  if(!isNew) $('#tdDel').onclick = ()=>{
+    DB.schedule = DB.schedule.filter(x=>x.id!==it.id);
+    save(); closeSheet(); renderSchedule(); toast('已删除');
+  };
+}
+
+/* 闹钟提醒 */
+let notifyTimers = [];
+function requestNotify(title, date, time){
+  const when = new Date(`${date}T${time}:00`).getTime();
+  const diff = when - nowTs();
+  if(diff <= 0){ toast('已添加，提醒时间已过'); return; }
+  if(diff > 864e5){ toast('已保存提醒时间（超过 24 小时，请在系统闹钟中备份）'); return; }
+  if('Notification' in window && Notification.permission === 'default'){
+    try{ Notification.requestPermission(); }catch(e){}
+  }
+  const t = setTimeout(()=>{
+    toast(`提醒：${title}`);
+    try{
+      if('Notification' in window && Notification.permission==='granted'){
+        new Notification('当然可以 · 待办提醒', {body:title});
+      }
+      // 页面内提示音
+      const ctx = window.__ac || (window.__ac = new (window.AudioContext||window.webkitAudioContext)());
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 880; g.gain.value = 0.06;
+      o.start(); setTimeout(()=>{ o.stop(); },260);
+    }catch(e){}
+  }, Math.min(diff, 2147483000));
+  notifyTimers.push(t);
+  toast('已设置提醒 · ' + date.slice(5) + ' ' + time);
+}
+
+/* ==========================================================================
+   模块二：医学英语 · 科室分类体系
+   ========================================================================== */
+const DEPTS = ['全科','内科','外科','急诊','用药相关','妇产科','儿科','影像检验','护理','医学英语'];
+/* 关键词 → 科室 自动归类（用于批量导入时缺失科室字段的单词） */
+const DEPT_KEYWORDS = [
+  ['急诊', ['emergency','trauma','shock','resuscitat','triage','cardiac arrest','cpr','defibrill','acute','acute abdomen','poison','overdose','hemorrhage','haemorrhage','anaphyla']],
+  ['用药相关', ['drug','dose','dosage','mg','tablet','capsule','infusion','iv ','po ','qd','bid','tid','prescrib','antibiotic','analgesic','anticoagul','contraindicat','pharmac','medication','adverse']],
+  ['妇产科', ['pregnan','obstetric','gynec','gynaec','uterus','uterine','placenta','labor','labour','delivery','cesarean','menstrua','ovary','ovarian','fetal','fetus']],
+  ['儿科', ['pediatric','paediatric','infant','neonat','child','newborn','congenital']],
+  ['外科', ['surgery','surgical','incision','suture','appendect','laparoscop','anesthesia','anaesthesia','postoperative','preoperative','fracture','graft','ostomy','resection','biopsy','drainage','hernia']],
+  ['影像检验', ['radiograph','ultrasound','sonograph','computed tomography',' mri','magnetic resonance','scan','biochemistr','laboratory','serum','assay','hemoglobin','haemoglobin','creatinine','electrolyte','culture','patholog']],
+  ['护理', ['nursing','catheter','dressing','wound care','bedsores','decubitus','vital sign','hygiene','positioning']],
+  ['内科', ['cardiac','cardio','myocard','arrhythm','hypertens','pneumon','pulmon','respirat','asthma','bronch','gastr','hepat','nephr','renal','endocrin','diabet','thyroid','anemia','anaemia','leukemia','hema','neuro','cerebr','stroke','epilep','arthritis','rheumat','infect','sepsis','fever','diarrhea','cirrhosis','coronary','angina','heart failure','ulcer','colitis','hepatitis','pancreat','dialysis']],
+  ['全科', ['history','diagnosis','symptom','examination','auscultation','palpation','percussion','counseling','follow-up','prognosis','screening','prevention','primary care','complaint','discharge','referral']]
+];
+function guessDept(word, meaning){
+  const s = ((word||'')+' '+(meaning||'')).toLowerCase();
+  for(const [dept, keys] of DEPT_KEYWORDS){
+    for(const k of keys){ if(s.includes(k)) return dept; }
+  }
+  return '全科';
+}
+const DEPT_ICON = {全科:'🩺',内科:'🫀',外科:'🔪',急诊:'🚨',用药相关:'💊',妇产科:'👶',儿科:'🧒',影像检验:'🔬',护理:'🩹',医学英语:'📘'};
+
+/* ==========================================================================
+   模块二：医学英语 · 内置离线医疗翻译引擎
+   基于医学术语词典 + 句式模板，输出临床地道译法（不依赖网络）
+   ========================================================================== */
+const MED_DICT = {
+  /* —— 症状与主诉 —— */
+  '胸痛':'chest pain','胸闷':'chest tightness','气短':'shortness of breath','呼吸困难':'dyspnea',
+  '急性':'acute','慢性':'chronic','轻度':'mild','中度':'moderate','重度':'severe','严重':'severe',
+  '病史':'history','既往史':'past history','病程':'disease course','症状':'symptoms',
+  '年':'years','月':'months','天':'days','周':'weeks','小时':'hours','分钟':'minutes',
+  '每天':'daily','每周':'weekly',
+  /* —— 时间量短语（含介词，直接命中可避免 for/of 丢失） —— */
+  '一天前':'one day ago','两天前':'two days ago','三天前':'three days ago','一周前':'one week ago',
+  '一个月前':'one month ago','一年前':'one year ago',
+  '一天':'for one day','两天':'for two days','三天':'for three days','四天':'for four days',
+  '五天':'for five days','一周':'for one week','两周':'for two weeks','一个月':'for one month',
+  '半年':'for half a year','一年':'for one year','两年':'for two years','数年':'for several years',
+  '数天':'for several days','几个月':'for several months','多年':'for many years',
+  '一小时':'for one hour','两小时':'for two hours','数小时':'for several hours',
+  '检查':'examination','检验':'laboratory test','治疗':'treatment','异常':'abnormality','正常':'normal',
+  '住院治疗':'admission for treatment','门诊治疗':'outpatient treatment','保守治疗':'conservative treatment',
+  '手术':'surgery','复查':'follow-up','转诊':'referral','监护':'monitoring','变化':'changes',
+  '心脏病':'heart disease','肺部感染':'pulmonary infection','尿路感染':'urinary tract infection',
+  '出汗':'sweating','多汗':'hyperhidrosis','大汗':'profuse sweating','出冷汗':'cold sweats',
+  '心肌酶':'cardiac enzymes','肌钙蛋白':'troponin','心肌酶谱':'cardiac enzyme panel',
+  '急性冠脉综合征':'acute coronary syndrome','肺栓塞':'pulmonary embolism','主动脉夹层':'aortic dissection',
+  '气胸':'pneumothorax','张力性气胸':'tension pneumothorax','心肌缺血':'myocardial ischemia',
+  '下肢':'lower extremity','双下肢':'bilateral lower extremities','上肢':'upper extremity',
+  '颈静脉':'jugular vein','双侧血压':'bilateral blood pressure','危险分层':'risk stratification',
+  '溶栓':'thrombolysis','介入治疗':'percutaneous intervention','冠状动脉造影':'coronary angiography',
+  '普通病房':'general ward','口服药':'oral medication','静脉用药':'intravenous medication',
+  '既往':'past history','五年':'for five years','十年':'for ten years','两年':'for two years',
+  '甲钴胺':'mecobalamin','阿司匹林':'aspirin','阿莫西林':'amoxicillin',
+  '咳嗽':'cough','咳痰':'productive cough','咯血':'hemoptysis','发热':'fever','发烧':'fever',
+  '寒战':'chills','乏力':'fatigue','头晕':'dizziness','眩晕':'vertigo','头痛':'headache',
+  '恶心':'nausea','呕吐':'vomiting','腹痛':'abdominal pain','肚子疼':'abdominal pain',
+  '腹泻':'diarrhea','便秘':'constipation','便血':'hematochezia','黑便':'melena',
+  '心慌':'palpitations','心悸':'palpitations','水肿':'edema','浮肿':'edema','盗汗':'night sweats',
+  '消瘦':'weight loss','体重下降':'weight loss','食欲减退':'loss of appetite','厌食':'anorexia',
+  '失眠':'insomnia','晕厥':'syncope','意识障碍':'disturbance of consciousness','抽搐':'convulsion',
+  '麻木':'numbness','无力':'weakness','关节痛':'arthralgia','肌肉酸痛':'myalgia','腰痛':'low back pain',
+  '咽痛':'sore throat','鼻塞':'nasal congestion','流涕':'runny nose','打喷嚏':'sneezing',
+  '皮肤瘙痒':'pruritus','皮疹':'rash','黄疸':'jaundice','尿频':'frequency of urination',
+  '尿急':'urgency of urination','尿痛':'dysuria','少尿':'oliguria','无尿':'anuria',
+  '多饮':'polydipsia','多尿':'polyuria','多食':'polyphagia','视物模糊':'blurred vision',
+  /* —— 体征 —— */
+  '血压':'blood pressure','心率':'heart rate','脉搏':'pulse','呼吸':'respiration','体温':'body temperature',
+  '发热38度':'fever of 38°C','高热':'high fever','低热':'low-grade fever','血压升高':'elevated blood pressure',
+  '血压偏低':'hypotension','心动过速':'tachycardia','心动过缓':'bradycardia','心律不齐':'arrhythmia',
+  '呼吸音粗':'coarse breath sounds','肺部湿啰音':'pulmonary crackles','喘鸣':'wheezing',
+  '腹部压痛':'abdominal tenderness','反跳痛':'rebound tenderness','肝脾肿大':'hepatosplenomegaly',
+  '颈静脉怒张':'jugular venous distension','双下肢水肿':'bilateral lower extremity edema',
+  /* —— 科室 —— */
+  '内科':'Internal Medicine','外科':'Surgery','急诊科':'Emergency Department','儿科':'Pediatrics',
+  '妇产科':'Obstetrics and Gynecology','骨科':'Orthopedics','神经内科':'Neurology',
+  '心内科':'Cardiology','呼吸内科':'Respiratory Medicine','消化内科':'Gastroenterology',
+  '内分泌科':'Endocrinology','肾内科':'Nephrology','血液科':'Hematology','肿瘤科':'Oncology',
+  '麻醉科':'Anesthesiology','皮肤科':'Dermatology','眼科':'Ophthalmology','耳鼻喉科':'Otolaryngology',
+  '口腔科':'Dentistry','精神科':'Psychiatry','感染科':'Infectious Diseases','重症医学科':'Intensive Care Unit',
+  '门诊':'outpatient department','急诊':'emergency department','病房':'ward','住院部':'inpatient ward',
+  '手术室':'operating room','药房':'pharmacy','检验科':'clinical laboratory','放射科':'radiology',
+  /* —— 检查与操作 —— */
+  '血常规':'complete blood count (CBC)','尿常规':'urinalysis','便常规':'stool routine',
+  '肝功能':'liver function test','肾功能':'renal function test','血糖':'blood glucose',
+  '血脂':'lipid profile','电解质':'electrolytes','凝血功能':'coagulation profile',
+  '心电图':'electrocardiogram (ECG)','心脏彩超':'echocardiography','胸部CT':'chest CT',
+  '胸部X线':'chest X-ray','腹部超声':'abdominal ultrasound','磁共振':'MRI','胃镜':'gastroscopy',
+  '肠镜':'colonoscopy','支气管镜':'bronchoscopy','腰椎穿刺':'lumbar puncture','穿刺':'puncture',
+  '活检':'biopsy','输血':'blood transfusion','输液':'intravenous infusion','吸氧':'oxygen therapy',
+  '心电监护':'cardiac monitoring','导尿':'urinary catheterization','换药':'wound dressing change',
+  '拆线':'suture removal','气管插管':'endotracheal intubation','心肺复苏':'cardiopulmonary resuscitation (CPR)',
+  '体格检查':'physical examination','查体':'physical examination','听诊':'auscultation','触诊':'palpation',
+  '叩诊':'percussion','问诊':'history taking','病历':'medical record','主诉':'chief complaint',
+  '现病史':'history of present illness','既往史':'past medical history','过敏史':'allergy history',
+  '家族史':'family history','个人史':'personal history','体格检查结果':'physical examination findings',
+  /* —— 诊断与疾病 —— */
+  '肺炎':'pneumonia','支气管炎':'bronchitis','哮喘':'asthma','慢阻肺':'COPD','肺结核':'pulmonary tuberculosis',
+  '肺癌':'lung cancer','高血压':'hypertension','冠心病':'coronary heart disease','心绞痛':'angina pectoris',
+  '心肌梗死':'myocardial infarction','心力衰竭':'heart failure','心律失常':'arrhythmia',
+  '房颤':'atrial fibrillation','胃炎':'gastritis','胃溃疡':'gastric ulcer','胆囊炎':'cholecystitis',
+  '胰腺炎':'pancreatitis','肝炎':'hepatitis','肝硬化':'cirrhosis','阑尾炎':'appendicitis',
+  '糖尿病':'diabetes mellitus','甲状腺功能亢进':'hyperthyroidism','甲状腺功能减退':'hypothyroidism',
+  '贫血':'anemia','白血病':'leukemia','肾炎':'nephritis','肾衰竭':'renal failure','尿路感染':'urinary tract infection',
+  '脑梗死':'cerebral infarction','脑出血':'cerebral hemorrhage','癫痫':'epilepsy','帕金森病':'Parkinson disease',
+  '骨折':'fracture','关节炎':'arthritis','类风湿关节炎':'rheumatoid arthritis','痛风':'gout',
+  '感染':'infection','败血症':'sepsis','休克':'shock','过敏':'allergy','过敏性休克':'anaphylactic shock',
+  '肿瘤':'tumor','良性':'benign','恶性':'malignant','转移':'metastasis','鉴别诊断':'differential diagnosis',
+  '并发症':'complication','预后':'prognosis','适应症':'indication','禁忌症':'contraindication',
+  /* —— 医嘱与用药 —— */
+  '口服':'orally (p.o.)','静脉注射':'intravenous injection (i.v.)','肌肉注射':'intramuscular injection (i.m.)',
+  '静脉滴注':'intravenous drip (ivgtt)','皮下注射':'subcutaneous injection (s.c.)','每日一次':'once daily (q.d.)',
+  '每日两次':'twice daily (b.i.d.)','每日三次':'three times daily (t.i.d.)','每6小时一次':'every 6 hours (q6h)',
+  '每8小时一次':'every 8 hours (q8h)','睡前':'at bedtime (q.n.)','必要时':'as needed (p.r.n.)',
+  '饭前':'before meals (a.c.)','饭后':'after meals (p.c.)','立即':'immediately (stat)',
+  '长期医嘱':'standing order','临时医嘱':'stat order','停药':'discontinue the medication',
+  '调整剂量':'adjust the dosage','皮试':'skin test','过敏试验':'allergy test','副作用':'side effect',
+  '不良反应':'adverse reaction','药物相互作用':'drug interaction','耐药':'drug resistance',
+  '抗生素':'antibiotic','止痛药':'analgesic','退热药':'antipyretic','降压药':'antihypertensive',
+  '利尿剂':'diuretic','激素':'steroid','胰岛素':'insulin','疫苗':'vaccine','镇静剂':'sedative',
+  '剂量':'dosage','片剂':'tablet','胶囊':'capsule','注射液':'injection','片':'tablet',
+  '毫克':'mg','毫升':'mL','克':'g','单位':'unit','清晨空腹':'on an empty stomach in the morning',
+  /* —— 处置与随访 —— */
+  '住院':'admission','出院':'discharge','转科':'transfer to another department','会诊':'consultation',
+  '手术':'surgery','术前准备':'preoperative preparation','术后护理':'postoperative care',
+  '麻醉':'anesthesia','知情同意':'informed consent','签署同意书':'sign the consent form',
+  '复查':'follow-up visit','复诊':'return visit','随访':'follow-up','随诊':'follow-up',
+  '观察':'observe','监护':'monitor','禁食':'fasting (NPO)','卧床休息':'bed rest',
+  '低盐饮食':'low-salt diet','糖尿病饮食':'diabetic diet','流质饮食':'liquid diet','半流质':'semi-liquid diet',
+  '清淡饮食':'light diet','戒烟戒酒':'quit smoking and alcohol','适当运动':'moderate exercise',
+  '多饮水':'increase fluid intake','保持大便通畅':'keep regular bowel movements',
+  '定期监测':'regular monitoring','控制体重':'weight control','低脂饮食':'low-fat diet',
+  '生命体征':'vital signs','体征':'vital signs','生命体征变化':'changes in vital signs',
+  '病情变化':'changes in condition','出人量':'intake and output','出入量':'intake and output','病情稳定':'the condition is stable',
+  '病情好转':'the condition is improving','病情加重':'the condition is deteriorating',
+  '病危':'critical condition','症状缓解':'symptoms have relieved','无明显异常':'no significant abnormality',
+  /* —— 沟通用语 —— */
+  '您好':'Hello','请问有什么可以帮您':'How can I help you?','请坐':'Please have a seat',
+  '哪里不舒服':'What brings you in today?','多久了':'How long has this been going on?',
+  '什么时候开始的':'When did it start?','有没有加重':'Has it been getting worse?',
+  '还有什么不适':'Any other symptoms?','以前有没有':'Have you ever had this before?',
+  '吃过什么药':'What medication have you taken?','有没有药物过敏':'Do you have any drug allergies?',
+  '请张嘴':'Please open your mouth','深呼吸':'Take a deep breath','放松':'Please relax',
+  '躺下':'Please lie down','我给您检查一下':'Let me examine you',
+  '需要做检查':'We need to run some tests','建议住院':'I recommend admission',
+  '不用担心':'Don\'t worry','请放心':'Please be assured','配合治疗':'cooperate with the treatment',
+  '按时服药':'take your medication on time','有问题随时联系':'contact us anytime if you have problems',
+  '祝您早日康复':'Wish you a speedy recovery'
+};
+/* 句式模板：中文模式 → 英文句式（定义见下方 MED_PATTERNS） */
+/* 英文 → 中文：反向索引 + 英文症状描述 */
+const EN_SYMPTOMS = [
+  [/\bchest pain\b/i,'胸痛'],[/\bshortness of breath\b|\bdyspnea\b/i,'呼吸困难'],[/\bcough\b/i,'咳嗽'],
+  [/\bfever\b|\bpyrexia\b/i,'发热'],[/\bfatigue\b|\bmalaise\b/i,'乏力'],[/\bdizziness\b|\bvertigo\b/i,'头晕'],
+  [/\bnausea\b/i,'恶心'],[/\bvomiting\b/i,'呕吐'],[/\babdominal pain\b/i,'腹痛'],[/\bdiarrhea\b/i,'腹泻'],
+  [/\bconstipation\b/i,'便秘'],[/\bheadache\b/i,'头痛'],[/\bpalpitations?\b/i,'心悸'],[/\bedema\b/i,'水肿'],
+  [/\binsomnia\b/i,'失眠'],[/\bsyncope\b/i,'晕厥'],[/\bnumbness\b/i,'麻木'],[/\bweakness\b/i,'无力'],
+  [/\bnight sweats\b/i,'盗汗'],[/\bweight loss\b/i,'体重下降'],[/\banorexia\b/i,'食欲减退'],
+  [/\bhemoptysis\b/i,'咯血'],[/\bhematochezia\b|\bmelena\b/i,'消化道出血'],[/\bjaundice\b/i,'黄疸'],
+  [/\bdysuria\b/i,'尿痛'],[/\boliguria\b/i,'少尿'],[/\bpolyuria\b/i,'多尿'],[/\bpolydipsia\b/i,'多饮'],
+  [/\bblurred vision\b/i,'视物模糊'],[/\bmyalgia\b/i,'肌肉酸痛'],[/\barthralgia\b/i,'关节痛']
+];
+const EN_VERBS = [
+  [/\bcomplain(?:s|ed)? of\b/i,'主诉'],[/\bpresent(?:s|ed)? with\b/i,'表现为'],
+  [/\bdiagnos(?:is|ed|e) (?:with|as)\b/i,'诊断为'],[/\bprescrib(?:e|ed|es)\b/i,'处方（给予）'],
+  [/\badmi(?:t|tted)\b/i,'收住院'],[/\bdischarg(?:e|ed)\b/i,'出院'],
+  [/\brecommend(?:s|ed)?\b/i,'建议'],[/\badminister(?:ed|s)?\b/i,'给予（用药）'],
+  [/\bmonitor(?:ed|s)?\b/i,'监测'],[/\bperform(?:ed|s)?\b/i,'实施（操作）'],
+  [/\breveal(?:s|ed)?\b/i,'提示（结果）'],[/\bsuggest(?:s|ed)?\b/i,'提示（结果）'],
+  [/\bstart(?:ed|s)? (?:on|with)\b/i,'开始使用'],[/\bcontinue(?:d|s)?\b/i,'继续'],
+  [/\bdiscontinue(?:d|s)?\b/i,'停用'],[/\bunderwent\b/i,'接受了'],
+  [/\bno significant abnormality\b/i,'未见明显异常']
+];
+function translateLex(text){
+  let s = ' ' + text + ' ', out = s;
+  // 先按长度倒序匹配，避免短词覆盖长词
+  const pairs = Object.entries(MED_DICT).filter(([k])=>/[\u4e00-\u9fa5]/.test(k))
+    .sort((a,b)=>b[0].length-a[0].length);
+  let hit = 0;
+  for(const [zh,en] of pairs){
+    if(out.includes(zh)){ out = out.split(zh).join(' ⟦'+en+'⟧ '); hit++; }
+  }
+  return { out: out.replace(/\s+/g,' ').trim(), hit };
+}
+/* —— 中文虚词/量词清理（翻译前剥离，避免残留中文） —— */
+const ZH_STOP = [
+  '伴有','并且','而且','以及','同时','合并','出现','发生','存在','目前','一直','这几天','最近','既往','病史',
+  '的','了','着','过','和','与','及','等','很','比较','非常','明显','进一步','立即','尽快','应该','把','被','给',
+  '做','进行','使用','接受','情况','变化','方面','以','并','还','就','都','要','会','能','可以','应该'
+];
+/* 数字/时间 中文 → 英文 */
+const ZH_NUM = {'零':'0','一':'1','两':'2','二':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10','半':'0.5'};
+function zhNumToEn(s){
+  let o = s;
+  o = o.replace(/[零一两二三四五六七八九十半]+/g, m=>{
+    if(m.length===1 && ZH_NUM[m]) return ZH_NUM[m]+' ';
+    // 处理 十/十一/二十三 等
+    if(/^十[零一二三四五六七八九]?$/.test(m)) return (m.length===1?10:10+(ZH_NUM[m[1]]||0))+' ';
+    if(/^[一二三四五六七八九]十[零一二三四五六七八九]?$/.test(m)) return ((ZH_NUM[m[0]]||0)*10 + (m.length>2?(ZH_NUM[m[2]]||0):0))+' ';
+    let out=''; for(const ch of m){ if(ZH_NUM[ch]!==undefined) out += ZH_NUM[ch]; }
+    return (out||m)+' ';
+  });
+  return o.replace(/(\d)\s+(\d)/g,'$1$2').replace(/\s+/g,' ').trim();
+}
+/* 句式模板：中文模式 → 英文句式（按顺序匹配，先具体后笼统） */
+const MED_PATTERNS = [
+  {re:/^(?:患者|病人|他|她)(?:主诉|诉)(.+?)[。]?$/, en:m=>`The patient complains of ${m}.`},
+  // 病史类：先抓「病史 + 时长」组合，避免 medical history 重复 & 时长位置错乱
+  {re:/^(?:患者|病人|他|她)?(?:既往)?(?:有|患有)?(.+?)病史(?:\s*([零一两二三四五六七八九十百\d]+)\s*(个?年|个月|周|天|小时))?[。]?$/,
+    en:(m,dur,unit)=>{
+      const U={'年':'years','个年':'years','个月':'months','月':'months','周':'weeks','天':'days','小时':'hours'}[unit]||'years';
+      const N=dur?zhNumToEn(dur).trim():'';
+      return `The patient has a ${N?N+' '+U+' ':''}history of ${m}.`;
+    }},
+  {re:/^(?:患者|病人)?(?:既往)?(?:有|患有)(.+?)[。]?$/, en:m=>`The patient has a history of ${m}.`},
+  // 时间段 + 持续：胸痛三天 → chest pain for three days
+  {re:/^(.+?)(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s*(年|个月|月|周|天|小时|分钟)$/,
+    en:(m,t,u)=>`${m} for ${t} ${u==='年'?'years':u==='月'||u==='个月'?'months':u==='周'?'weeks':u==='天'?'days':u==='小时'?'hours':'minutes'}`},
+  {re:/^(?:患者|病人|他|她)(?:出现|发生)(.+?)[。]?$/, en:m=>`The patient developed ${m}.`},
+  {re:/^(?:患者|病人|他|她)(?:伴有|合并)(.+?)[。]?$/, en:m=>`The patient presents with ${m}.`},
+  {re:/^我(?:最近|这几天)?(?:一直|总是)?(.+?)(?:了|啦)?[。？!！]?$/, en:m=>`I have had ${m} recently.`},
+  {re:/^(?:建议)(?:完善|开具|安排|做)?(.+?)[。]?$/, en:m=>`I recommend ${m}.`},
+  {re:/^(?:推荐)(.+?)[。]?$/, en:m=>`I recommend ${m}.`},
+  {re:/^(?:需要|应当|必须)\s*排除(.+?)[。]?$/, en:m=>`Rule out ${m}.`},
+  {re:/^排除(.+?)[。]?$/, en:m=>`Rule out ${m}.`},
+  {re:/^(?:需要|必须|应当)(.+?)[。]?$/, en:m=>`We need to ${m}.`},
+  {re:/^(?:给予|用)(.+?)[。]?$/, en:m=>`Administer ${m}.`},
+  {re:/^(?:完善|开具|安排)(.+?)[。]?$/, en:m=>`Order ${m}.`},
+  {re:/^(?:嘱|告诉|让)(?:患者|病人)?(.+?)[。]?$/, en:m=>`Instruct the patient to ${m}.`},
+  {re:/^(?:密切)?(?:观察|监测)(.+?)[。]?$/, en:m=>`Closely monitor ${m}.`},
+  {re:/^(?:定期)?(?:复查|随访)(.+?)[。]?$/, en:m=>`Regular follow-up of ${m} is required.`},
+  {re:/^诊断(?:为)?(.+?)[。]?$/, en:m=>`Diagnosis: ${m}.`},
+  {re:/^考虑(.+?)[。]?$/, en:m=>`${m.charAt(0).toUpperCase()+m.slice(1)} should be considered in the differential diagnosis.`},
+  {re:/^排除(.+?)[。]?$/, en:m=>`Rule out ${m}.`},
+  {re:/^请(.+?)[。]?$/, en:m=>`Please ${m}.`}
+];
+function cleanChinese(s){
+  /* 输入是含 ⟦term⟧ 占位块的字符串。策略：
+     ① 把 ⟦…⟧ 块抽成占位符，块内英文原样保护；
+     ② 只在块外做中文虚词剥离 & 数字转换；
+     ③ 还原占位符后，再清掉块外残留中文（保证不出现中文混入英文）。 */
+  let out = String(s);
+  const blocks = [];
+  out = out.replace(/⟦([^⟧]*)⟧/g, (_m,en)=>{ blocks.push(en.trim()); return '\u0001'+(blocks.length-1)+'\u0001'; });
+  // 中文数字 → 阿拉伯数字（块外）
+  out = zhNumToEn(out);
+  // 并列连接词：夹在两个术语块之间的「和/与/及/、」→ and（必须在剥离虚词之前）
+  out = out.replace(/(\u0001\d+\u0001)\s*(?:和|与|及|、)\s*(\u0001\d+\u0001)/g,'$1 and $2');
+  // 剥离中文虚词（块外）
+  ZH_STOP.sort((a,b)=>b.length-a.length).forEach(w=>{ out = out.split(w).join(' '); });
+  // 清掉块外残留的未收录中文
+  out = out.replace(/[\u4e00-\u9fa5]+/g,' ');
+  // 还原术语块（块间用单空格连接，术语自身保持原样）
+  out = out.replace(/\u0001(\d+)\u0001/g, (_m,i)=>' '+blocks[Number(i)]+' ');
+  return out.replace(/[ \t]{2,}/g,' ').trim();
+}
+/* 英文润色：规范标点与单位，不做词序/连词改写（避免破坏医学术语） */
+function polishEN(s){
+  let t = String(s)
+    .replace(/[，、；]\s*/g, ', ')     // 全角标点 → 半角
+    .replace(/\s*,\s*/g, ', ')
+    .replace(/\s+/g,' ')
+    .trim();
+  /* 单位规范：100毫克 → 100 mg */
+  t = t.replace(/(\d)\s*(mg|ml|kg|cm|mm|mmol|μg|ug|iu|g)\b/gi,(m,n,u)=>n+' '+u.toLowerCase());
+  return t.replace(/,\s*\./g,'.').replace(/\s+([,.;:])/g,'$1').replace(/[,\s]+$/,'').trim();
+}
+function translateC2E(input){
+  const raw = input.trim();
+  const clean = raw.replace(/[。.，,；;！!？?、]$/,'');
+  // 1) 整句模板匹配
+  for(const p of MED_PATTERNS){
+    const m = clean.match(p.re);
+    if(m){
+      const inner = translateLex(m[1]);
+      if(inner.hit){
+        let body = cleanChinese(inner.out).replace(/\s+/g,' ').trim();
+        if(!body || /[\u4e00-\u9fa5]/.test(body)) continue;
+        body = polishEN(body);
+        return { en: p.en(body), method:'句式模板 + 医学术语', terms: inner.hit };
+      }
+    }
+  }
+  // 2) 纯词典长句组装
+  const lex = translateLex(clean);
+  if(lex.hit >= 1){
+    let body = cleanChinese(lex.out).replace(/\s+/g,' ').trim();
+    if(body && !/[\u4e00-\u9fa5]/.test(body)){
+      body = polishEN(body);
+      const isQuestion = /[吗么呢？?]$/.test(raw);
+      return { en: body + (isQuestion?'?':'.'), method:'医学术语对照', terms: lex.hit };
+    }
+  }
+  return { en:'', method:'none', terms:0 };
+}
+function translateE2C(input){
+  const raw = input.trim();
+  let s = ' ' + raw + ' ';
+  let words = 0;
+  const used = [];
+  /* 1) 症状/体征短语 */
+  for(const [re,zh] of EN_SYMPTOMS){ if(re.test(s)){ s = s.replace(re, zh); words++; used.push(zh); } }
+  /* 2) 临床动词 */
+  for(const [re,zh] of EN_VERBS){ if(re.test(s)){ s = s.replace(re, zh); words++; used.push(zh); } }
+  /* 2.5) 高频结构短语（必须抢在词典反向之前，否则会被逐词拆散） */
+  const PRE = [
+    [/\b(?:was|is|were|are|has been|had been) admitted (?:to [^.,]*? )?with (?:a |an |the )?history of\b/gi,'既往有'],
+    [/\b(?:was|is|were|are|has been|had been) admitted(?: to [^.,]*)?\b/gi,'收住院'],
+    [/\b(?:a |an |the )?history of\b/gi,'既往有'],
+    [/\b(?:a |an |the )?history of present illness\b/gi,'现病史'],
+    [/\bcomplains? of\b/gi,'主诉'],
+    [/\bpresents? with\b/gi,'表现为'],
+    [/\brevealed\b|\breveals\b|\bshowed\b|\bshows\b/gi,'提示'],
+    [/\bfor (\d+) (days?|weeks?|months?|years?)\b/gi,(m,a,u)=>`持续${a}${{day:'天',days:'天',week:'周',weeks:'周',month:'月',months:'月',year:'年',years:'年'}[u.toLowerCase()]||u}`],
+    [/\bin the (right|left) (upper|lower) lobe\b/gi,(m,side,pos)=>`${side.toLowerCase()==='right'?'右':'左'}${pos.toLowerCase()==='upper'?'上':'下'}叶`]
+  ];
+  for(const [re,rep] of PRE){ if(re.test(s)){ s = s.replace(re, typeof rep==='function'?rep:rep); words++; } }
+  /* 3) 词典反向（仅匹配 ≥4 字符且带词边界的英文，避免 "ent" 命中 "patient"） */
+  const rev = Object.entries(MED_DICT)
+    .filter(([k,v])=>/[a-zA-Z]/.test(v) && v.length>=4 && /^[a-zA-Z][a-zA-Z (),.\-]*$/.test(v))
+    .map(([zh,en])=>[en,zh])
+    .sort((a,b)=>b[0].length-a[0].length);
+  for(const [en,zh] of rev){
+    /* 转义正则元字符（避免直接书写 ${ 造成模板字面量冲突） */
+    const META = '[.*+?^' + '$' + '{}()|[\\]\\\\]';
+    const esc = en.replace(new RegExp(META,'g'), '\\$&');
+    /* 词边界：前后不能紧邻字母 */
+    const re = new RegExp('(?<![A-Za-z])' + esc + '(?![A-Za-z])','i');
+    if(re.test(s)){ s = s.replace(re, zh); words++; used.push(zh); }
+  }
+  /* 3.5) 单复数与常见变化形态兜底 */
+  const FUZZY = [
+    [/\b(?:diabetes mellitus|diabetes)\b/gi,'糖尿病'],
+    [/\b(?:asthma)\b/gi,'哮喘'],
+    [/\b(?:pneumoniae?)\b/gi,'肺炎'],
+    [/\b(?:appendicitis)\b/gi,'阑尾炎'],
+    [/\b(?:hypertensives?|hypertension)\b/gi,'高血压'],
+    [/\b(?:dyspnea|dyspnoea)\b/gi,'呼吸困难'],
+    [/\b(?:surgeries|surgery)\b/gi,'手术'],
+    [/\b(?:medications?|medicines?|drugs?)\b/gi,'药物'],
+    [/\b(?:allergies|allergy)\b/gi,'过敏'],
+    [/\b(?:symptoms?)\b/gi,'症状'],
+    [/\b(?:examinations?)\b/gi,'检查'],
+    [/\b(?:tests?)\b/gi,'检查'],
+    [/\b(?:treatments?)\b/gi,'治疗'],
+    [/\b(?:pains?)\b/gi,'疼痛'],
+    [/\b(?:fevers?)\b/gi,'发热'],
+    [/\b(?:years?)\b/gi,'年'],
+    [/\b(?:days?)\b/gi,'天'],
+    [/\b(?:weeks?)\b/gi,'周'],
+    [/\b(?:months?)\b/gi,'月'],
+    [/\b(?:chronic)\b/gi,'慢性']
+  ];
+  for(const [re,zh] of FUZZY){
+    if(re.test(s)){ s = s.replace(re, zh); words++; }
+  }
+  /* 4) 常见句式 / 结构性表达（先长后短，避免被短规则破坏） */
+  const STRUCT = [
+    [/\b(?:the )?patient (?:complain(?:s|ed)? of|presents? with)\b/gi,'患者主诉'],
+    [/\bdenies? (?:any )?\b/gi,'否认'],
+    [/\bno significant abnormality (?:was|were) (?:found|seen|detected)(?: in [^.,]*)?\b/gi,'未见明显异常'],
+    [/\b(?:was|is|were|are) admitted (?:to [^.,]*? )?with a history of\b/gi,'收入院，既往有'],
+    [/\b(?:was|is|were|are) admitted(?: to [^.,]*)?\b/gi,'收入院'],
+    [/\b(?:a |an |the )?history of\b/gi,'既往有'],
+    [/\bphysical examination (?:shows?|revealed|reveals)\b/gi,'体格检查提示'],
+    [/\b(?:revealed|reveals|showed|shows|demonstrated|demonstrates)\b/gi,'提示'],
+    [/\bfor (\d+) (days?|weeks?|months?|years?)\b/gi,(m,a,u)=>`持续 ${a} ${{day:'天',days:'天',week:'周',weeks:'周',month:'月',months:'月',year:'年',years:'年'}[u.toLowerCase()]||u}`],
+    [/\bthe right lower lobe\b/gi,'右下叶'],
+    [/\bthe left (lower|upper) lobe\b/gi,(m,a)=>`左${{lower:'下',upper:'上'}[a.toLowerCase()]}叶`],
+    [/\bblood test\b|\bblood work\b/gi,'血液检查'],
+    [/\bbilateral(?:ly)?\b/gi,'双侧'],
+    [/\bcoarse breath sounds\b/gi,'呼吸音粗'],
+    [/\bchest x-?ray\b|\bchest radiograph\b/gi,'胸部X线'],
+    [/\bdiagnosis\s*:\s*/gi,'诊断：'],
+    [/\bdiagnosed with\b/gi,'诊断为'],
+    [/\bdenies\b/gi,'否认'],
+    [/\bno\b/gi,'未见'],
+    [/\bunremarkable\b/gi,'未见异常'],
+    [/\bstable\b/gi,'平稳'],
+    [/\brelieved\b/gi,'缓解'],
+    [/\bstart(?:ed)? (?:the patient )?on\b/gi,'开始使用'],
+    [/\bcontinue(?:d)?\b/gi,'继续'],
+    [/\bdiscontinue(?:d)?\b/gi,'停用'],
+    [/\broutine\b/gi,'常规'],
+    [/\band\b/gi,'和'],
+    [/\bwith\b/gi,'伴有']
+  ];
+  for(const [re,rep] of STRUCT){
+    if(re.test(s)){ s = s.replace(re, typeof rep==='function'?rep:(rep)); words++; }
+  }
+  /* 5) 剩余英文功能词润色 */
+  s = s.replace(/\b(?:the|a|an)\b/gi,' ')
+       .replace(/\b(?:any|some)\b/gi,' ')
+       .replace(/\bhistory of\b/gi,'')
+       .replace(/\bits?\b/gi,'其')
+       .replace(/\b(?:was|were|is|are|be|been)\b/gi,' ')
+       .replace(/\bonce\b/gi,'每日一次').replace(/\btwice\b/gi,'每日两次')
+       .replace(/\bthree times\b/gi,'每日三次').replace(/\borally\b/gi,'口服')
+       .replace(/\btimes?\b/gi,'次')
+       .replace(/\bnot\b/gi,'不')
+       .replace(/\bhe\b/gi,'他').replace(/\bshe\b/gi,'她')
+       .replace(/\bin\b|\bat\b|\bon\b/gi,'于')
+       .replace(/\bto\b/gi,'至')
+       .replace(/\bof\b/gi,'的')
+       .replace(/\s{2,}/g,' ')
+       .replace(/\s*([，。、；：])\s*/g,'$1').trim();
+  /* 5.5) 清理翻译腔残留 */
+  s = s.replace(/([\u4e00-\u9fa5]+)于([\u4e00-\u9fa5]+)/g,(_m,a,b)=>/叶|部|侧|段|肺|壁|端/.test(b)? a+' '+b : a+'为'+b);
+  s = s.replace(/伴有\s*既往有/g,'既往有').replace(/既往有\s*伴有/g,'既往有');
+  /* 频次合并：'每日三次 每天' → '每日三次'；'每日一次 每天' → '每日一次' */
+  s = s.replace(/(每日(?:一次|两次|三次|四次|每\S{1,3}小时))\s*(?:每天|每日)/g,'$1');
+  s = s.replace(/(?:每天|每日)\s*(每日(?:一次|两次|三次|四次))/g,'$1');
+  /* 部位前置：'肺炎 于 右下叶' → '右下叶肺炎'；'右下叶 肺炎' → '右下叶肺炎' */
+  s = s.replace(/([\u4e00-\u9fa5]{2,6}(?:叶|部|侧|段|肺))\s+([\u4e00-\u9fa5]{2,8})/g,(m,loc,n)=>loc+' '+n);
+  /* 6) 清理残留的孤立英文词（中文之间的短英文词，保留单位/缩写） */
+  const KEEP = /^(?:mg|ml|g|kg|cm|mm|mmhg|iu|u|ct|mri|ecg|eeg|x|s|hr|bpm|°c|℃|sp02|spo2|ph|iv|po|im|bid|tid|qd|qid|q\d+h?|prn|stat|no)$/i;
+  s = s.replace(/[\u4e00-\u9fa5]\s*([A-Za-z]{1,10}(?:\s+[A-Za-z]{1,10}){0,2})\s*(?=[\u4e00-\u9fa5]|$)/g, (m,w)=>{
+    const parts = w.trim().split(/\s+/);
+    if(parts.some(p=>KEEP.test(p))) return m;
+    return m.replace(w,' ');
+  });
+  /* 6.5) 句首孤立英文（未识别的英文短语） */
+  s = s.replace(/^\s*([A-Za-z]{1,10}(?:\s+[A-Za-z]{1,10}){0,2})\s+(?=[\u4e00-\u9fa5])/g,(m,w)=>{
+    const parts=w.trim().split(/\s+/);
+    if(parts.some(p=>KEEP.test(p))) return m;
+    return m.replace(w,'');
+  });
+  /* 7) 句首/句尾连接词清理 + 空格归一 */
+  s = s.replace(/^\s*(?:为|伴有|和|的|于|持续|不|至|其|收住院|既往有)\s*/,'')
+       .replace(/\s*(?:为|伴有|和|的|于|至|其)\s*$/,'')
+       .replace(/\s{2,}/g,' ')
+       .replace(/^[,，、；;:：\s]+/,'')
+       .replace(/[,，、；;:：\s]+$/,'').trim();
+  /* 8) 合并连续重复词 */
+  s = s.replace(/([\u4e00-\u9fa5]{2,6})\s+\1/g,'$1');
+  return { zh:s||raw, method: words? '医学术语对照' : 'none', terms:words };
+}
+
+/* ==========================================================================
+   模块二：医学英语
+   ========================================================================== */
+let engTab = 'words';
+let wordFilter = 'all';
+function renderEnglish(){
+  $('#p-english').innerHTML = `
+    <div class="secHead">
+      <div><h2>医学英语</h2><p>为全英文行医场景做准备</p></div>
+    </div>
+    <div class="seg">
+      <button data-tab="words" class="${engTab==='words'?'active':''}">单词记忆</button>
+      <button data-tab="dialogue" class="${engTab==='dialogue'?'active':''}">场景跟读</button>
+      <button data-tab="trans" class="${engTab==='trans'?'active':''}">医疗双向翻译</button>
+    </div>
+    <div id="engBody"></div>`;
+  $$('#p-english .seg button').forEach(b=>b.onclick=()=>{ engTab=b.dataset.tab; renderEnglish(); });
+  if(engTab==='words') renderWords();
+  else if(engTab==='dialogue') renderDialogues();
+  else renderMedTrans();
+}
+function renderWords(){
+  const usedDepts = [...new Set(DB.words.map(w=>w.scene).filter(Boolean))];
+  const chips = ['all', ...DEPTS.filter(d=>usedDepts.includes(d)), ...usedDepts.filter(d=>!DEPTS.includes(d))];
+  if(!chips.includes(wordFilter)) wordFilter='all';
+  const pool = wordFilter==='all' ? DB.words : DB.words.filter(w=>w.scene===wordFilter);
+  const list = pool;
+  const done = DB.words.filter(w=>w.done).length;
+  const streak = calcStreak();
+  const todayN = (DB.meta.stats[today()]&&DB.meta.stats[today()].words)||0;
+  const deptDone = pool.filter(w=>w.done).length;
+  const body = $('#engBody');
+  body.innerHTML = `
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="stat"><div class="n">${done}/${DB.words.length}</div><div class="l">已掌握词汇</div></div>
+      <div class="stat"><div class="n">${streak}</div><div class="l">连续打卡天数</div></div>
+    </div>
+    <div class="card tint">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">今日已记 ${todayN} 个单词</div>
+          <div class="hint" style="margin-top:3px">点击单词卡片可朗读发音，点左侧圆圈打卡</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:11px">
+        <button class="btn primary sm" id="addWord">${svg('plus')}手动录入</button>
+        <button class="btn ghost sm" id="impWords">${svg('upload')}批量导入词库</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:14px 3px 8px">
+      <span style="font-size:12px;font-weight:700;color:var(--ink-700)">按科室筛选</span>
+      <span class="tag gray">${pool.length} 词 · 已掌握 ${deptDone}</span>
+    </div>
+    <div class="chipBar">
+      ${chips.map(s=>`<button class="chip${wordFilter===s?' active':''}" data-s="${esc(s)}">${s==='all'?'全部科室':esc(DEPT_ICON[s]||'')+' '+esc(s)}</button>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;margin:2px 2px 10px">
+      <input class="inp" id="wordSearch" placeholder="搜索单词或释义…" style="flex:1">
+      <button class="btn sm" id="quizBtn">${svg('play')}测</button>
+    </div>
+    <div id="wordList">
+      ${list.length?list.map(wordHTML).join(''):`<div class="empty"><div class="eIco">${svg('language')}</div><p>${DB.words.length?'该科室下暂无单词':'还没有单词，可手动录入或批量导入词库'}</p></div>`}
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div style="font-size:12.5px;font-weight:700;margin-bottom:9px;color:var(--ink-700)">记忆打卡日历</div>
+      <div class="calGrid">${calHTML()}</div>
+    </div>`;
+
+  $('#addWord').onclick = ()=>wordEditor(null);
+  $('#impWords').onclick = openWordImport;
+  $$('#engBody .chip').forEach(c=>c.onclick=()=>{ wordFilter=c.dataset.s; renderWords(); });
+  $('#wordSearch').oninput = e=>{
+    const q = e.target.value.trim().toLowerCase();
+    const box = $('#wordList');
+    const f = (wordFilter==='all'?DB.words:DB.words.filter(w=>w.scene===wordFilter))
+      .filter(w=>!q || w.word.toLowerCase().includes(q) || (w.meaning||'').toLowerCase().includes(q));
+    box.innerHTML = f.length?f.map(wordHTML).join(''):`<div class="empty"><div class="eIco">${svg('search')}</div><p>没有匹配的单词</p></div>`;
+    bindWords(box);
+  };
+  $('#quizBtn').onclick = startQuiz;
+  bindWords($('#wordList'));
+}
+function wordHTML(w){
+  return `<div class="item${w.done?' done':''}" data-id="${w.id}">
+    <div class="itemHead">
+      <button class="cb${w.done?' on':''}" data-toggle>${svg('check')}</button>
+      <div class="itemMb">
+        <div class="itemTitle" data-speak title="点击朗读">${esc(w.word)} <span style="font-size:11px;color:var(--ink-300);font-weight:500">${esc(w.pos||'')}</span>
+          <span class="spk" style="display:inline-flex;vertical-align:middle;margin-left:3px">${svg('mic')}</span></div>
+        <div class="itemSub">${esc(w.meaning)}</div>
+        <div class="itemMeta">${w.scene?`<span class="tag">${esc(DEPT_ICON[w.scene]||'')} ${esc(w.scene)}</span>`:''}${w.done?`<span class="tag ok">已掌握</span>`:''}${w.imported?`<span class="tag gray">导入</span>`:''}</div>
+      </div>
+      <button class="iconBtn del" data-del>${svg('trash')}</button>
+    </div>
+  </div>`;
+}
+function bindWords(box){
+  $$('.item',box).forEach(el=>{
+    const w = DB.words.find(x=>x.id===el.dataset.id); if(!w) return;
+    el.querySelector('[data-toggle]').onclick = ()=>{
+      w.done = !w.done;
+      if(w.done){ bumpStat('words'); w.doneAt=nowTs(); toast('已掌握 · 打卡成功'); }
+      save(); renderWords();
+    };
+    el.querySelector('[data-del]').onclick = ()=>{ DB.words=DB.words.filter(x=>x.id!==w.id); save(); renderWords(); toast('已删除'); };
+    el.querySelector('[data-speak]').onclick = e=>{
+      e.stopPropagation();
+      speakWord(w.word);
+      el.style.background='#FAF4F5';
+      setTimeout(()=>{ el.style.background=''; },420);
+    };
+    el.querySelector('.itemMb').onclick = ()=>wordEditor(w);
+  });
+}
+/* 单词发音（Web Speech API） */
+function speakWord(word){
+  if(!('speechSynthesis' in window)){ toast('当前浏览器不支持语音朗读'); return; }
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang='en-US'; u.rate=.8; u.pitch=1;
+    const vs = window.speechSynthesis.getVoices();
+    const en = vs.find(v=>/en[-_]US/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang));
+    if(en) u.voice = en;
+    window.speechSynthesis.speak(u);
+  }catch(e){ toast('朗读失败'); }
+}
+function bumpStat(key){
+  const t = today();
+  if(!DB.meta.stats[t]) DB.meta.stats[t] = {};
+  DB.meta.stats[t][key] = (DB.meta.stats[t][key]||0)+1;
+}
+function calcStreak(){
+  let n=0, d=today();
+  for(let i=0;i<400;i++){
+    const s = DB.meta.stats[d];
+    if(s && ((s.words||0)>0 || (s.dialogues||0)>0)){ n++; d = addDays(d,-1); }
+    else break;
+  }
+  return n;
+}
+function calHTML(){
+  const t = today(); let h='';
+  for(let i=27;i>=0;i--){
+    const d = addDays(t,-i);
+    const dt = new Date(d+'T00:00:00');
+    const s = DB.meta.stats[d];
+    const hit = s && ((s.words||0)>0||(s.dialogues||0)>0);
+    h += `<div class="calCell${hit?' hit':''}${d===t?' today':''}" title="${d}">${dt.getDate()}</div>`;
+  }
+  return h;
+}
+function wordEditor(w){
+  const isNew = !w; const d = w || {word:'',pos:'n.',meaning:'',scene:''};
+  openSheet(`
+    <div class="sheetTitle">${isNew?'手动录入医学单词':'编辑单词'}</div>
+    <div class="sheetDesc">录入后可在列表中点击单词朗读、点圆圈打卡记忆。</div>
+    <div class="field"><label>单词 / 词组</label><input class="inp" id="wW" value="${esc(d.word)}" placeholder="例如：myocardial infarction"></div>
+    <div class="field"><label>词性</label><input class="inp" id="wP" value="${esc(d.pos||'')}" placeholder="n. / v. / adj."></div>
+    <div class="field"><label>中文释义</label><textarea class="inp" id="wM" rows="2" placeholder="心肌梗死">${esc(d.meaning)}</textarea></div>
+    <div class="field"><label>科室分类</label>
+      <select class="inp" id="wS">
+        <option value="">未分类</option>
+        ${DEPTS.map(s=>`<option value="${esc(s)}" ${d.scene===s?'selected':''}>${DEPT_ICON[s]} ${esc(s)}</option>`).join('')}
+        ${d.scene && !DEPTS.includes(d.scene) ? `<option value="${esc(d.scene)}" selected>${esc(d.scene)}（自定义）</option>`:''}
+      </select></div>
+    <div class="row" style="margin-top:14px">
+      ${isNew?'':`<button class="btn ghost" id="wDel">${svg('trash')}删除</button>`}
+      <button class="btn primary" id="wSave">保存</button></div>`);
+  setTimeout(()=>$('#wW').focus(),220);
+  $('#wSave').onclick = ()=>{
+    const word = $('#wW').value.trim();
+    if(!word){ toast('请填写单词'); return; }
+    const meaning = $('#wM').value.trim();
+    const scene = $('#wS').value || guessDept(word, meaning);
+    const p = { word, pos:$('#wP').value.trim(), meaning, scene };
+    if(isNew) DB.words.unshift({ id:uid(), ...p, done:false, ts:nowTs() });
+    else Object.assign(w,p);
+    save(); closeSheet(); renderWords(); toast(isNew?'已添加单词':'已保存');
+  };
+  if(!isNew) $('#wDel').onclick = ()=>{ DB.words=DB.words.filter(x=>x.id!==w.id); save(); closeSheet(); renderWords(); toast('已删除'); };
+}
+
+/* ==========================================================================
+   批量导入医学单词词库（JSON）
+   支持字段：英文单词 / 中文释义 / 科室分类 / 记忆打卡状态
+   智能去重：已存在的单词不会覆盖，已打卡记录完整保留
+   ========================================================================== */
+function normalizeWordItem(raw){
+  if(typeof raw === 'string'){
+    // 支持 "word | 释义 | 科室" 或 "word 释义" 简写
+    const parts = raw.split(/\s*[|｜\t]\s*/).filter(Boolean);
+    if(parts.length>=2) return {word:parts[0].trim(), meaning:parts.slice(1,parts.length>2?parts.length-1:parts.length).join('；').trim(), scene:(parts.length>2?parts[parts.length-1]:'').trim(), done:false};
+    const m = raw.match(/^([A-Za-z][A-Za-z\s\-']+?)\s+([\u4e00-\u9fa5].*)$/);
+    if(m) return {word:m[1].trim(), meaning:m[2].trim(), scene:'', done:false};
+    return null;
+  }
+  if(!raw || typeof raw!=='object') return null;
+  const word = String(raw.word ?? raw.en ?? raw.english ?? raw.term ?? raw.单词 ?? raw.英文 ?? '').trim();
+  if(!word) return null;
+  const meaning = String(raw.meaning ?? raw.zh ?? raw.cn ?? raw.chinese ?? raw.definition ?? raw.释义 ?? raw.中文 ?? '').trim();
+  const scene = String(raw.scene ?? raw.dept ?? raw.department ?? raw.category ?? raw.科室 ?? raw.分类 ?? '').trim();
+  // 打卡状态：支持 true/false、"done"/"已掌握"/1/"yes"
+  const dv = raw.done ?? raw.mastered ?? raw.learned ?? raw.status ?? raw.打卡 ?? raw.状态;
+  let done = false;
+  if(typeof dv==='boolean') done = dv;
+  else if(typeof dv==='number') done = dv>0;
+  else if(typeof dv==='string'){
+    const s = dv.trim().toLowerCase();
+    done = ['true','1','yes','y','done','mastered','已掌握','已完成','已打卡','是','学习过'].includes(s);
+  }
+  const tsV = Number(raw.ts ?? raw.timestamp ?? raw.doneAt) || 0;
+  return { word, meaning, scene, done, ts: tsV };
+}
+function openWordImport(){
+  openSheet(`
+    <div class="sheetTitle">批量导入医学单词词库</div>
+    <div class="sheetDesc">支持 <b>JSON 词库文件</b>，或直接粘贴文本。导入为<b>追加</b>模式：已录入、已打卡的单词会被智能跳过，<b>不会覆盖</b>你的学习记录。</div>
+    <div class="row" style="margin-bottom:10px">
+      <button class="btn ghost sm" id="impFile">${svg('upload')}选择 JSON 文件</button>
+      <button class="btn ghost sm" id="impTpl">${svg('download')}下载模板</button>
+    </div>
+    <div class="field"><label>或粘贴内容</label>
+      <textarea class="inp" id="impText" rows="7" placeholder='[
+  {"word":"dyspnea","meaning":"呼吸困难","scene":"内科","done":false},
+  {"word":"suture","meaning":"缝合；缝线","scene":"外科","done":true}
+]'></textarea></div>
+    <div class="hint">支持的字段名：英文单词 <span class="mono">word / en / english / term</span>，中文释义 <span class="mono">meaning / zh / cn / definition</span>，科室 <span class="mono">scene / dept / department / category</span>，打卡状态 <span class="mono">done / mastered / status</span>。<br>缺少科室时会按释义自动归类。</div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn ghost" id="impCancel">取消</button>
+      <button class="btn primary" id="impGo">批量导入</button>
+    </div>`);
+  $('#impCancel').onclick = closeSheet;
+  $('#impGo').onclick = ()=>doWordImport($('#impText').value, 'paste');
+  $('#impFile').onclick = ()=>{
+    const inp = document.createElement('input');
+    inp.type='file'; inp.accept='.json,.txt,application/json';
+    inp.onchange = ()=>{
+      const f = inp.files && inp.files[0]; if(!f) return;
+      const fr = new FileReader();
+      fr.onload = ()=>{ doWordImport(fr.result, 'file'); };
+      fr.readAsText(f);
+    };
+    inp.click();
+  };
+  $('#impTpl').onclick = ()=>{
+    const tpl = JSON.stringify([
+      {word:'dyspnea', meaning:'呼吸困难', scene:'内科', done:false},
+      {word:'suture', meaning:'缝合；缝线', scene:'外科', done:false},
+      {word:'triage', meaning:'分诊', scene:'急诊', done:false}
+    ], null, 2);
+    downloadFile(tpl, '医学单词词库模板.json', 'application/json');
+    toast('模板已下载');
+  };
+}
+function parseImportPayload(text){
+  const t = text.trim();
+  if(!t) return [];
+  try{
+    const j = JSON.parse(t);
+    let arr = j;
+    if(!Array.isArray(j)){
+      arr = j.words || j.list || j.data || j.items || Object.values(j).find(v=>Array.isArray(v)) || [];
+      // 支持 { "dyspnea":"呼吸困难", ... } 映射格式
+      if(!Array.isArray(arr) && typeof j==='object'){
+        const map = Object.entries(j).filter(([k,v])=>typeof v==='string');
+        if(map.length) return map.map(([k,v])=>({word:k, meaning:v, scene:'', done:false}));
+      }
+    }
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){
+    // 纯文本：每行一个
+    return t.split('\n').map(s=>s.trim()).filter(s=>s && !s.startsWith('//') && !s.startsWith('#'));
+  }
+}
+function doWordImport(text, src){
+  const items = parseImportPayload(text);
+  if(!items.length){ toast('没有解析到有效内容，请检查 JSON 格式'); return; }
+  const norm = items.map(normalizeWordItem).filter(Boolean);
+  if(!norm.length){ toast('没有解析到有效单词，请检查字段名'); return; }
+
+  let added=0, skipped=0, autoDept=0;
+  const existing = new Map();
+  DB.words.forEach(w=>existing.set(w.word.toLowerCase().trim(), w));
+
+  norm.forEach(n=>{
+    const key = n.word.toLowerCase().trim();
+    const has = existing.get(key);
+    if(has){
+      skipped++;
+      // 若原有未打卡而导入为已打卡，则同步打卡状态（保留原 id 与学习记录）
+      if(n.done && !has.done){ has.done = true; has.doneAt = n.doneAt || nowTs(); }
+      // 补齐原缺失的释义/科室，不覆盖已有内容
+      if(!has.meaning && n.meaning) has.meaning = n.meaning;
+      if(!has.scene && n.scene){ has.scene = n.scene; }
+      return;
+    }
+    const scene = n.scene || (autoDept++, guessDept(n.word, n.meaning));
+    const w = {
+      id: uid(), word:n.word, pos:'', meaning:n.meaning || '',
+      scene, done:!!n.done, imported:true, ts: n.ts || nowTs()
+    };
+    if(w.done) w.doneAt = w.ts;
+    DB.words.push(w);
+    existing.set(key, w);
+    added++;
+  });
+  save();
+  closeSheet();
+  renderWords();
+  openModal(`<h3>导入完成</h3>
+    <div class="out">成功新增 <b>${added}</b> 个单词<br>
+    跳过已存在（含已打卡）<b>${skipped}</b> 个<br>
+    自动归类科室 <b>${autoDept}</b> 个<br>
+    当前词库共 <b>${DB.words.length}</b> 个单词</div>
+    <div class="hint">已导入内容全部保存在本机 localStorage，断网也可正常学习。</div>
+    <div class="foot"><button class="btn primary" onclick="closeModal()">好的</button></div>`);
+}
+function downloadFile(content, filename, mime){
+  try{
+    const blob = new Blob([content], {type:mime||'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  }catch(e){ toast('下载失败'); }
+}
+
+/* 单词小测验 */
+let quiz = null;
+function startQuiz(){
+  const pool = DB.words.filter(w=>w.meaning);
+  if(pool.length < 3){ toast('至少需要 3 个单词才能测验'); return; }
+  const pick = shuffle(pool).slice(0, Math.min(8, pool.length));
+  quiz = { items:pick, i:0, right:0 };
+  showQuiz();
+}
+function showQuiz(){
+  if(!quiz || quiz.i >= quiz.items.length){
+    const r = quiz ? quiz.right : 0, n = quiz ? quiz.items.length : 0;
+    openModal(`<h3>测验完成</h3>
+      <div class="out" style="text-align:center;font-size:15px">本组答对 <b style="font-size:22px">${r}</b> / ${n} 题<br>
+      <span style="font-size:12px;color:var(--ink-500)">正确率 ${n?Math.round(r/n*100):0}%</span></div>
+      <div class="foot"><button class="btn ghost" onclick="closeModal()">关闭</button>
+      <button class="btn primary" onclick="closeModal();startQuiz()">再来一组</button></div>`);
+    quiz = null; return;
+  }
+  const cur = quiz.items[quiz.i];
+  const others = shuffle(DB.words.filter(w=>w.id!==cur.id && w.meaning)).slice(0,3).map(w=>w.meaning);
+  const opts = shuffle([cur.meaning, ...others]);
+  openModal(`
+    <h3>单词测验 · ${quiz.i+1}/${quiz.items.length}</h3>
+    <div style="text-align:center;padding:14px 0 4px;font-size:20px;font-weight:700;color:var(--pink-700)">${esc(cur.word)}</div>
+    <div style="text-align:center;font-size:11.5px;color:var(--ink-500);margin-bottom:14px">选择正确的中文释义</div>
+    <div id="qOpts" style="display:flex;flex-direction:column;gap:8px">
+      ${opts.map((o,i)=>`<button class="btn" style="justify-content:flex-start;text-align:left;padding:12px 14px" data-o="${esc(o)}">${String.fromCharCode(65+i)}. ${esc(o)}</button>`).join('')}
+    </div>
+    <div class="foot"><button class="btn ghost" onclick="closeModal()">退出测验</button></div>`);
+  $$('#qOpts .btn').forEach(b=>b.onclick=()=>{
+    const ok = b.dataset.o === cur.meaning;
+    if(ok){ quiz.right++; b.style.background='#F2F6F3'; b.style.borderColor='#cfe6d6'; b.style.color='#4f7d5e';
+      if(!cur.done){ cur.done=true; bumpStat('words'); save(); } }
+    else{ b.style.background='#FAF4F5'; b.style.borderColor='#EFE4E7'; b.style.color='#8C6A72'; }
+    setTimeout(()=>{ quiz.i++; showQuiz(); }, ok?420:900);
+  });
+}
+
+function renderDialogues(){
+  const body = $('#engBody');
+  const scenes = [...new Set(DB.dialogues.map(d=>d.scene).filter(Boolean))];
+  body.innerHTML = `
+    <div class="secHead" style="margin:2px 2px 10px">
+      <div><p style="margin:0">内置医患沟通、查房、术前告知、问诊等场景，可直接跟读练习</p></div>
+      <button class="btn primary sm" id="addDlg">${svg('plus')}手动新增</button>
+    </div>
+    <div class="card tint" style="margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px">整套对话素材批量导入</div>
+      <div class="hint" style="margin:0 0 10px">导入的对话会直接进入跟读练习板块，可立即开始跟读。共 ${DB.dialogues.length} 套素材${scenes.length?` · 覆盖 ${scenes.length} 类场景`:''}。</div>
+      <div class="row">
+        <button class="btn primary sm" id="impDlg">${svg('upload')}批量导入对话</button>
+        <button class="btn ghost sm" id="impDlgTpl">${svg('download')}下载模板</button>
+      </div>
+    </div>
+    ${DB.dialogues.map(d=>`
+      <div class="item" data-id="${d.id}">
+        <div class="itemHead">
+          <div class="itemMb" data-open>
+            <div class="itemTitle">${esc(d.title)}</div>
+            <div class="itemSub">${d.lines.length} 句对话${d.builtin?' · 系统内置':(d.imported?' · 批量导入':' · 自定义')}</div>
+            <div class="itemMeta">
+              <span class="tag">${esc(d.scene||'场景')}</span>
+              ${d.practiced?`<span class="tag ok">已练习 ${d.practiced} 次</span>`:''}
+            </div>
+          </div>
+          <button class="iconBtn del" data-del>${svg('trash')}</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn sm ghost" data-open>${svg('play')}逐句练习</button>
+          <button class="btn sm ghost" data-full>${svg('language')}整段播放</button>
+          <button class="btn sm" data-follow>${svg('mic')}跟读全文</button>
+        </div>
+      </div>`).join('')}
+    <div class="card tint"><div class="hint" style="margin:0">跟读练习使用浏览器自带语音合成朗读英文原句。「整段播放」会连续朗读全套对话；「跟读全文」在每句朗读后留出停顿，方便你自己跟读。首次使用需允许音频播放。</div></div>`;
+
+  $('#addDlg').onclick = ()=>dlgEditor(null);
+  $('#impDlg').onclick = openDlgImport;
+  $('#impDlgTpl').onclick = ()=>{
+    const tpl = JSON.stringify([
+      {title:'术前告知对话', scene:'术前告知', lines:[
+        {en:"I'd like to explain the procedure to you.", zh:'我来向您说明一下手术过程。'},
+        {en:'It usually takes about one hour.', zh:'手术大约需要一小时。'}
+      ]},
+      {title:'门诊问诊对话', scene:'问诊', lines:[
+        {en:'What brings you in today?', zh:'您今天哪里不舒服？'},
+        {en:'How long has this been going on?', zh:'这种情况持续多久了？'}
+      ]}
+    ], null, 2);
+    downloadFile(tpl, '医学场景对话素材模板.json', 'application/json');
+    toast('模板已下载');
+  };
+  $$('#engBody .item').forEach(el=>{
+    const d = DB.dialogues.find(x=>x.id===el.dataset.id); if(!d) return;
+    el.querySelector('[data-open]').onclick = ()=>playDialogue(d);
+    el.querySelector('[data-del]').onclick = ()=>{
+      DB.dialogues = DB.dialogues.filter(x=>x.id!==d.id);
+      save(); renderDialogues(); toast('已删除');
+    };
+    el.querySelector('[data-full]').onclick = ()=>playFullDialogue(d, false);
+    el.querySelector('[data-follow]').onclick = ()=>playFullDialogue(d, true);
+  });
+}
+/* ---- 对话批量导入 ---- */
+function normalizeDlgItem(raw){
+  if(!raw || typeof raw!=='object') return null;
+  const title = String(raw.title ?? raw.name ?? raw.标题 ?? '').trim();
+  let lines = raw.lines ?? raw.dialogue ?? raw.content ?? raw.conversation ?? raw.dialog ?? raw.对话 ?? [];
+  const scene = String(raw.scene ?? raw.category ?? raw.dept ?? raw.场景 ?? raw.分类 ?? '自定义场景').trim();
+  if(typeof lines === 'string'){
+    lines = lines.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>{
+      const i = s.indexOf('|')>=0 ? s.indexOf('|') : s.indexOf('｜');
+      if(i<0){
+        // "A: Hello  你好" 或纯英文
+        const m = s.match(/^(?:[A-Za-z]+\s*[:：]\s*)?(.+?)\s*[\u4e00-\u9fa5].*$/);
+        return i<0 ? {en:s.replace(/^[A-Za-z]+\s*[:：]\s*/,'').trim(), zh:'', speaker:''} : {en:s.slice(0,i).trim(), zh:s.slice(i+1).trim()};
+      }
+      return {en:s.slice(0,i).trim(), zh:s.slice(i+1).trim()};
+    });
+  }else if(Array.isArray(lines)){
+    lines = lines.map(l=>{
+      if(typeof l === 'string'){
+        const i = l.indexOf('|');
+        return i<0 ? {en:l.trim(), zh:''} : {en:l.slice(0,i).trim(), zh:l.slice(i+1).trim()};
+      }
+      if(l && typeof l==='object'){
+        return {
+          en: String(l.en ?? l.english ?? l.text ?? l.sentence ?? l.英文 ?? '').trim(),
+          zh: String(l.zh ?? l.cn ?? l.chinese ?? l.translation ?? l.中文 ?? '').trim(),
+          speaker: String(l.speaker ?? l.role ?? l.who ?? l.角色 ?? '').trim()
+        };
+      }
+      return null;
+    }).filter(Boolean);
+  }else{ return null; }
+  lines = lines.filter(l=>l && l.en);
+  if(!title || !lines.length) return null;
+  return { title, scene, lines };
+}
+function parseDlgPayload(text){
+  const t = text.trim(); if(!t) return [];
+  try{
+    const j = JSON.parse(t);
+    if(Array.isArray(j)) return j;
+    const arr = j.dialogues || j.list || j.data || j.items || j.conversations || Object.values(j).find(v=>Array.isArray(v));
+    return Array.isArray(arr) ? arr : (j.title ? [j] : []);
+  }catch(e){ return []; }
+}
+function openDlgImport(){
+  openSheet(`
+    <div class="sheetTitle">批量导入医院场景对话</div>
+    <div class="sheetDesc">支持 <b>JSON 素材文件</b>或粘贴文本。可一次导入整套医患沟通、查房、术前告知、问诊对话，导入后直接进入跟读练习板块。</div>
+    <div class="row" style="margin-bottom:10px">
+      <button class="btn ghost sm" id="dImpFile">${svg('upload')}选择 JSON 文件</button>
+      <button class="btn ghost sm" id="dImpTpl">${svg('download')}下载模板</button>
+    </div>
+    <div class="field"><label>或粘贴 JSON 内容</label>
+      <textarea class="inp" id="dImpText" rows="8" placeholder='[
+  {
+    "title": "术前告知对话",
+    "scene": "术前告知",
+    "lines": [
+      {"en": "I would like to explain the procedure to you.", "zh": "我来向您说明手术过程。"}
+    ]
+  }
+]'></textarea></div>
+    <div class="hint">字段说明：<span class="mono">title</span> 对话标题，<span class="mono">scene</span> 场景分类，<span class="mono">lines</span> 对话数组，每句含 <span class="mono">en</span>（英文）与 <span class="mono">zh</span>（中文）；也支持 <span class="mono">"英文 | 中文"</span> 字符串写法。</div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn ghost" id="dImpCancel">取消</button>
+      <button class="btn primary" id="dImpGo">批量导入</button>
+    </div>`);
+  $('#dImpCancel').onclick = closeSheet;
+  $('#dImpGo').onclick = ()=>doDlgImport($('#dImpText').value, 'paste');
+  $('#dImpFile').onclick = ()=>{
+    const inp = document.createElement('input');
+    inp.type='file'; inp.accept='.json,.txt,application/json';
+    inp.onchange = ()=>{
+      const f = inp.files && inp.files[0]; if(!f) return;
+      const fr = new FileReader();
+      fr.onload = ()=>{ doDlgImport(fr.result,'file'); };
+      fr.readAsText(f);
+    };
+    inp.click();
+  };
+  $('#dImpTpl').onclick = ()=>{
+    const tpl = JSON.stringify([
+      {title:'术前告知对话', scene:'术前告知', lines:[
+        {en:"I'd like to explain the procedure to you.", zh:'我来向您说明一下手术过程。'},
+        {en:'It usually takes about one hour.', zh:'手术大约需要一小时。'},
+        {en:'The main risks are bleeding and infection.', zh:'主要风险是出血和感染。'}
+      ]},
+      {title:'门诊问诊对话', scene:'问诊', lines:[
+        {en:'What brings you in today?', zh:'您今天哪里不舒服？'},
+        {en:'How long has this been going on?', zh:'这种情况持续多久了？'},
+        {en:'Any other symptoms?', zh:'还有其他不适吗？'}
+      ]}
+    ], null, 2);
+    downloadFile(tpl,'医学场景对话素材模板.json','application/json');
+    toast('模板已下载');
+  };
+}
+function doDlgImport(text, src){
+  const items = parseDlgPayload(text);
+  if(!items.length){ toast('没有解析到对话素材，请检查 JSON 格式'); return; }
+  const norm = items.map(normalizeDlgItem).filter(Boolean);
+  if(!norm.length){ toast('对话缺少标题或内容，请检查字段名'); return; }
+
+  let added=0, skipped=0, lines=0;
+  const exist = new Set(DB.dialogues.map(d=>d.title.trim().toLowerCase()));
+  norm.forEach(n=>{
+    const key = n.title.trim().toLowerCase();
+    if(exist.has(key)){ skipped++; return; }
+    DB.dialogues.push({ id:uid(), title:n.title, scene:n.scene||'自定义场景', lines:n.lines, builtin:false, imported:true, ts:nowTs() });
+    exist.add(key); added++; lines += n.lines.length;
+  });
+  save(); closeSheet(); renderDialogues();
+  openModal(`<h3>导入完成</h3>
+    <div class="out">成功导入 <b>${added}</b> 套对话素材，共 <b>${lines}</b> 句<br>
+    跳过同名素材 <b>${skipped}</b> 套<br>
+    当前共 <b>${DB.dialogues.length}</b> 套，均已加入跟读练习板块</div>
+    <div class="hint">全部内容保存在本机 localStorage，断网也能打开跟读练习。</div>
+    <div class="foot"><button class="btn primary" id="goFollow">去跟读练习</button>
+      <button class="btn ghost" onclick="closeModal()">稍后</button></div>`);
+  const g = $('#goFollow');
+  if(g) g.onclick = ()=>{ closeModal(); const first=DB.dialogues.find(d=>d.imported); if(first) playDialogue(first); };
+}
+function dlgEditor(d){
+  const isNew=!d;
+  openSheet(`
+    <div class="sheetTitle">${isNew?'手动新增场景对话':'编辑场景对话'}</div>
+    <div class="sheetDesc">每行一句，英文与中文用「|」分隔。<br>例如：<span class="mono">How are you feeling? | 您感觉怎么样？</span></div>
+    <div class="field"><label>对话标题</label><input class="inp" id="dT" value="${esc(d?d.title:'')}" placeholder="例如：急诊分诊沟通"></div>
+    <div class="field"><label>场景分类</label><input class="inp" id="dS" value="${esc(d?d.scene:'')}" placeholder="医患沟通 / 查房 / 术前告知 / 问诊" list="dlgSceneDl">
+      <datalist id="dlgSceneDl">
+        <option value="医患沟通"><option value="查房"><option value="术前告知"><option value="问诊">
+        <option value="医嘱告知"><option value="急诊分诊"><option value="出院宣教">
+      </datalist></div>
+    <div class="field"><label>对话内容</label>
+      <textarea class="inp" id="dB" rows="7" placeholder="Good morning. | 早上好。&#10;How is your pain today? | 今天疼痛怎么样？">${d?esc(d.lines.map(l=>l.en+' | '+l.zh).join('\n')):''}</textarea></div>
+    <div class="row" style="margin-top:14px">
+      ${isNew?'':`<button class="btn ghost" id="dDel">${svg('trash')}删除</button>`}
+      <button class="btn primary" id="dSave">保存</button></div>`);
+  $('#dSave').onclick = ()=>{
+    const title = $('#dT').value.trim(); if(!title){ toast('请填写标题'); return; }
+    const lines = $('#dB').value.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>{
+      const i = s.indexOf('|');
+      return i<0 ? {en:s, zh:''} : {en:s.slice(0,i).trim(), zh:s.slice(i+1).trim()};
+    });
+    if(!lines.length){ toast('请至少填写一句对话'); return; }
+    const p = { title, scene:$('#dS').value.trim()||'自定义场景', lines, builtin:false };
+    if(isNew) DB.dialogues.unshift({ id:uid(), ...p, ts:nowTs() });
+    else Object.assign(d, p);
+    save(); closeSheet(); renderDialogues(); toast(isNew?'已新增对话':'已保存');
+  };
+  if(!isNew) $('#dDel').onclick = ()=>{ DB.dialogues=DB.dialogues.filter(x=>x.id!==d.id); save(); closeSheet(); renderDialogues(); toast('已删除'); };
+}
+/* ---- 整段对话音频播放 ---- */
+let fullPlay = null;
+function playFullDialogue(d, followMode){
+  stopFullPlay();
+  openModal(`
+    <h3>${esc(d.title)}</h3>
+    <div class="tagRow" style="margin-bottom:10px">
+      <span class="tag">${esc(d.scene||'场景')}</span>
+      <span class="tag gray">${d.lines.length} 句</span>
+      <span class="tag ${followMode?'warn':'ok'}" id="fpMode">${followMode?'跟读模式':'连续播放'}</span>
+    </div>
+    <div id="fpBody" style="max-height:46vh;overflow-y:auto;padding-right:2px">
+      ${d.lines.map((l,i)=>`<div class="fpLine" data-i="${i}" style="padding:9px 11px;border-radius:11px;margin-bottom:6px;border:1px solid var(--line-soft);background:var(--pink-50)">
+        <div style="font-size:13.5px;line-height:1.55">${esc(l.en)}</div>
+        <div style="font-size:11.5px;color:var(--ink-500);margin-top:3px">${esc(l.zh||'—')}</div>
+      </div>`).join('')}
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn ghost sm" id="fpStop">${svg('stop')}停止</button>
+      <button class="btn primary sm" id="fpReplay">${svg('refresh')}重新播放</button>
+    </div>
+    <div class="hint">${followMode?'整段跟读：每句朗读后停顿，留给你自己跟读一遍。':'整段播放：连续朗读全套对话，可对照下方文本。'}点击任意句子可单独重听。</div>
+    <div class="foot"><button class="btn ghost" onclick="stopFullPlay();closeModal()">关闭</button></div>`);
+
+  const list = d.lines.map((l,i)=>({en:l.en, zh:l.zh, i}));
+  fullPlay = { list, idx:0, followMode, paused:false, timer:null };
+  $('#fpStop').onclick = ()=>{ stopFullPlay(); toast('已停止播放'); };
+  $('#fpReplay').onclick = ()=>{ stopFullPlay(); playFullDialogue(d, followMode); };
+  $$('#fpBody .fpLine').forEach(el=>{
+    el.onclick = ()=>{
+      stopFullPlay();
+      speakSeq([{en:list[+el.dataset.i].en, zh:'', i:+el.dataset.i}], followMode);
+    };
+  });
+  speakSeq(list, followMode);
+}
+function highlightLine(i){
+  $$('#fpBody .fpLine').forEach(el=>{
+    const on = +el.dataset.i === i;
+    el.style.background = on ? '#EFE4E7' : 'var(--pink-50)';
+    el.style.borderColor = on ? 'var(--pink-300)' : 'var(--line-soft)';
+    if(on && el.scrollIntoView) el.scrollIntoView({block:'nearest',behavior:'smooth'});
+  });
+}
+function speakSeq(list, followMode){
+  if(!fullPlay) return;
+  if(!('speechSynthesis' in window)){ toast('当前浏览器不支持语音朗读'); return; }
+  let k = 0;
+  const next = ()=>{
+    if(!fullPlay || k >= list.length){
+      if(fullPlay){
+        const d = DB.dialogues.find(x=>x.title); // 保留计数入口
+      }
+      highlightLine(-1);
+      return;
+    }
+    const item = list[k];
+    highlightLine(item.i);
+    try{
+      const u = new SpeechSynthesisUtterance(item.en);
+      u.lang='en-US'; u.rate = followMode ? 0.82 : 0.88; u.pitch=1;
+      const vs = window.speechSynthesis.getVoices();
+      const en = vs.find(v=>/en[-_]US/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang));
+      if(en) u.voice = en;
+      u.onend = ()=>{
+        k++;
+        // 跟读模式留出停顿
+        fullPlay.timer = setTimeout(next, followMode ? 2600 : 420);
+      };
+      u.onerror = ()=>{ k++; fullPlay.timer = setTimeout(next, 300); };
+      window.speechSynthesis.speak(u);
+    }catch(e){ toast('朗读失败'); }
+  };
+  next();
+}
+function stopFullPlay(){
+  if(!fullPlay) return;
+  clearTimeout(fullPlay.timer);
+  try{ window.speechSynthesis.cancel(); }catch(e){}
+  highlightLine(-1);
+  fullPlay = null;
+}
+let speakIdx = null;
+function playDialogue(d, follow){
+  let i = 0;
+  const render = ()=>{
+    const cur = d.lines[i];
+    openModal(`
+      <h3>${esc(d.title)}</h3>
+      <div class="tagRow" style="margin-bottom:12px"><span class="tag">${esc(d.scene||'场景')}</span><span class="tag gray">${i+1} / ${d.lines.length}</span></div>
+      <div class="out" style="font-size:15px;line-height:1.7">${esc(cur.en)}</div>
+      <div style="font-size:13px;color:var(--ink-500);margin-top:9px;line-height:1.7">${esc(cur.zh||'—')}</div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn ghost sm" id="dPrev" ${i===0?'disabled style="opacity:.4"':''}>上一句</button>
+        <button class="btn primary sm" id="dSpeak">${svg('play')}${follow?'朗读本句':'朗读'}</button>
+        <button class="btn ghost sm" id="dNext">${i>=d.lines.length-1?'完成':'下一句'}</button>
+      </div>
+      <div class="hint">${follow?'跟读模式：听清英文发音后，自己大声读出，再对照中文检查理解。':'逐句练习，点击「朗读」收听英文原音。'}</div>
+      <div class="foot"><button class="btn ghost" id="dFull">整段播放</button><button class="btn ghost" onclick="closeModal()">结束练习</button></div>`);
+    $('#dSpeak').onclick = ()=>{ speak(cur.en); toast('正在朗读第 '+(i+1)+' 句'); };
+    $('#dPrev').onclick = ()=>{ if(i>0){ i--; render(); } };
+    $('#dFull').onclick = ()=>{ closeModal(); playFullDialogue(d, follow); };
+    $('#dNext').onclick = ()=>{
+      if(i>=d.lines.length-1){
+        d.practiced = (d.practiced||0)+1;
+        bumpStat('dialogues'); save(); closeModal();
+        toast('练习完成 · 已记入打卡'); renderDialogues(); return;
+      }
+      i++; render();
+    };
+    if(follow) speak(cur.en);
+  };
+  render();
+}
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)){ toast('当前浏览器不支持语音朗读'); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='en-US'; u.rate=.88; u.pitch=1;
+    const vs = window.speechSynthesis.getVoices();
+    const en = vs.find(v=>/en[-_]US/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang));
+    if(en) u.voice = en;
+    window.speechSynthesis.speak(u);
+  }catch(e){ toast('朗读失败'); }
+}
+
+/* ==========================================================================
+   模块二：医学英语 · 医疗双向翻译子标签
+   ========================================================================== */
+let transDir = 'c2e';
+let transHis = [];
+try{ transHis = JSON.parse(localStorage.getItem(LS_TRANS)||'[]') || []; }catch(e){ transHis = []; }
+function persistTransHis(){ try{ localStorage.setItem(LS_TRANS, JSON.stringify(transHis.slice(0,20))); }catch(e){} }
+function renderMedTrans(){
+  const body = $('#engBody');
+  body.innerHTML = `
+    <div class="seg" id="trDir" style="margin-bottom:12px">
+      <button data-d="c2e" class="${transDir==='c2e'?'active':''}">中文 → 英文</button>
+      <button data-d="e2c" class="${transDir==='e2c'?'active':''}">英文 → 中文</button>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:9px" id="trTitle">
+        ${transDir==='c2e'?'输入中文（问诊 / 医嘱 / 病情描述 / 病历）':'输入医学英文（句子 / 病历 / 对话）'}
+      </div>
+      <textarea class="inp" id="trIn" rows="4" placeholder="${transDir==='c2e'?'例如：患者主诉胸痛三天，伴有气短和出汗。':'e.g. The patient complains of chest pain for three days, with dyspnea and sweating.'}"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary sm" id="trGo">${svg('language')}翻译</button>
+        <button class="btn ghost sm" id="trClear">清空</button>
+      </div>
+    </div>
+    <div id="trOut"></div>
+    <div class="card tint">
+      <div style="font-size:12.5px;font-weight:700;margin-bottom:8px;color:var(--pink-700)">医疗场景常用句式速取</div>
+      <div class="chipBar" style="flex-wrap:wrap;overflow:visible">
+        ${(transDir==='c2e'?C2E_SAMPLES:E2C_SAMPLES).map((s,i)=>`<button class="chip" data-smp="${esc(s)}">${esc(s.length>16?s.slice(0,16)+'…':s)}</button>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+        <span style="font-size:12.5px;font-weight:700;color:var(--ink-700)">翻译历史</span>
+        ${transHis.length?`<button class="btn sm ghost" id="trHisClear">清空</button>`:''}
+      </div>
+      <div id="trHis">
+        ${transHis.length?transHis.map((h,i)=>`
+          <div style="padding:9px 0;border-bottom:1px dashed var(--line-soft)">
+            <div style="font-size:12px;color:var(--ink-500);word-break:break-word">${esc(h.src)}</div>
+            <div style="font-size:13px;font-weight:600;margin-top:3px;word-break:break-word">${esc(h.res)}</div>
+            <div style="margin-top:5px;display:flex;gap:6px">
+              <button class="btn sm ghost" data-reuse="${i}">${svg('refresh')}再次翻译</button>
+              <button class="btn sm" data-savevault="${i}">${svg('library')}存入思维库</button>
+            </div>
+          </div>`).join(''):`<div class="hint" style="margin:0">暂无翻译历史，翻译结果会自动记录在这里（仅保存在本机）。</div>`}
+      </div>
+    </div>
+    <div class="card tint">
+      <div class="hint" style="margin:0">本翻译为<b>内置离线医疗引擎</b>：基于医学术语对照表与临床句式模板，优先输出临床常用地道表达，全部本地计算，<b>断网可用</b>，内容不会上传。复杂长句建议结合专业翻译工具复核。</div>
+    </div>`;
+
+  $$('#trDir button').forEach(b=>b.onclick=()=>{ transDir=b.dataset.d; renderMedTrans(); });
+  $('#trGo').onclick = doTranslate;
+  $('#trClear').onclick = ()=>{ $('#trIn').value=''; $('#trOut').innerHTML=''; $('#trIn').focus(); };
+  $$('#engBody [data-smp]').forEach(b=>b.onclick=()=>{ $('#trIn').value=b.dataset.smp; doTranslate(); });
+  const hc = $('#trHisClear'); if(hc) hc.onclick = ()=>{ transHis=[]; persistTransHis(); renderMedTrans(); toast('已清空翻译历史'); };
+  $$('#engBody [data-reuse]').forEach(b=>b.onclick=()=>{
+    const h = transHis[+b.dataset.reuse]; if(!h) return;
+    transDir = h.dir; renderMedTrans();
+    setTimeout(()=>{ const i=$('#trIn'); i.value=h.src; doTranslate(); },60);
+  });
+  $$('#engBody [data-savevault]').forEach(b=>b.onclick=()=>{
+    const h = transHis[+b.dataset.savevault]; if(!h) return;
+    saveTransToVault(h);
+  });
+  const ta = $('#trIn');
+  ta.addEventListener('keydown', e=>{ if(e.key==='Enter' && (e.ctrlKey||e.metaKey)) doTranslate(); });
+}
+const C2E_SAMPLES = [
+  '患者主诉胸痛三天，伴有气短和出汗。',
+  '建议完善心电图和心肌酶检查。',
+  '患者既往有高血压病史五年。',
+  '给予阿司匹林100毫克口服，每日一次。',
+  '密切观察生命体征变化。',
+  '考虑急性冠脉综合征。',
+  '需要排除肺栓塞。',
+  '嘱患者卧床休息，低盐饮食。'
+];
+const E2C_SAMPLES = [
+  'The patient complains of chest pain for three days, with dyspnea and sweating.',
+  'Chest X-ray revealed pneumonia in the right lower lobe.',
+  'He was admitted with a history of hypertension.',
+  'Administer amoxicillin 0.5 g orally three times daily.',
+  'Physical examination shows coarse breath sounds bilaterally.',
+  'Diagnosis: acute appendicitis.',
+  'No significant abnormality was found in the blood test.',
+  'The patient denies any drug allergy.'
+];
+function doTranslate(){
+  const raw = ($('#trIn').value||'').trim();
+  if(!raw){ toast('请先输入需要翻译的内容'); return; }
+  const out = $('#trOut');
+  let res='', method='', terms=0, extra='';
+
+  if(transDir==='c2e'){
+    const r = translateC2E(raw);
+    if(!r.en){
+      out.innerHTML = `<div class="card"><div class="out">未匹配到内置医学术语。可在下方“常用句式速取”中参考地道表达，或补充更短的关键词再试（如：胸痛、发热、建议住院）。</div></div>`;
+      return;
+    }
+    res = r.en; method = r.method; terms = r.terms;
+    extra = buildC2EDetail(raw);
+  }else{
+    const r = translateE2C(raw);
+    res = r.zh; method = r.method; terms = r.terms;
+    if(r.method==='none'){ res = raw; }
+    extra = buildE2CDetail(raw);
+  }
+
+  out.innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+        <span style="font-size:12.5px;font-weight:700;color:var(--pink-700)">${transDir==='c2e'?'地道医学英文':'中文译文'}</span>
+        <span class="tag ${terms?'ok':'gray'}">${method==='none'?'未匹配术语':method}</span>
+      </div>
+      <div class="out" style="font-size:15px;line-height:1.7">${esc(res)}</div>
+      <div class="row" style="margin-top:11px">
+        <button class="btn ghost sm" id="trCopy">${svg('file')}复制</button>
+        <button class="btn ghost sm" id="trSpeak">${svg('mic')}朗读</button>
+        <button class="btn primary sm" id="trVault">${svg('library')}存入思维库</button>
+      </div>
+      ${extra?`<div class="divider"></div>${extra}`:''}
+    </div>`;
+
+  $('#trCopy').onclick = ()=>copyText(res,'译文已复制');
+  $('#trSpeak').onclick = ()=>speak(res);
+  $('#trVault').onclick = ()=>saveTransToVault({dir:transDir, src:raw, res, method});
+
+  transHis.unshift({dir:transDir, src:raw, res, method, ts:nowTs()});
+  if(transHis.length>20) transHis.pop();
+  persistTransHis();
+  renderTransHistoryOnly();
+}
+function renderTransHistoryOnly(){
+  const box = $('#trHis'); if(!box) return;
+  const hc = $('#trHisClear');
+  box.innerHTML = transHis.length ? transHis.map((h,i)=>`
+    <div style="padding:9px 0;border-bottom:1px dashed var(--line-soft)">
+      <div style="font-size:12px;color:var(--ink-500);word-break:break-word">${esc(h.src)}</div>
+      <div style="font-size:13px;font-weight:600;margin-top:3px;word-break:break-word">${esc(h.res)}</div>
+      <div style="margin-top:5px;display:flex;gap:6px">
+        <button class="btn sm ghost" data-reuse="${i}">${svg('refresh')}再次翻译</button>
+        <button class="btn sm" data-savevault="${i}">${svg('library')}存入思维库</button>
+      </div>
+    </div>`).join('') : `<div class="hint" style="margin:0">暂无翻译历史，翻译结果会自动记录在这里（仅保存在本机）。</div>`;
+  $$('#engBody [data-reuse]').forEach(b=>b.onclick=()=>{
+    const h = transHis[+b.dataset.reuse]; if(!h) return;
+    transDir=h.dir; renderMedTrans();
+    setTimeout(()=>{ $('#trIn').value=h.src; doTranslate(); },60);
+  });
+  $$('#engBody [data-savevault]').forEach(b=>b.onclick=()=>{
+    const h = transHis[+b.dataset.savevault]; if(!h) return; saveTransToVault(h);
+  });
+}
+function buildC2EDetail(raw){
+  const hits = [];
+  const clean = raw.replace(/[。.，,；;！!？?]/g,'');
+  Object.entries(MED_DICT).filter(([k])=>/[\u4e00-\u9fa5]/.test(k))
+    .sort((a,b)=>b[0].length-a[0].length)
+    .forEach(([zh,en])=>{ if(clean.includes(zh) && !hits.find(h=>h.zh===zh)) hits.push({zh,en}); });
+  if(!hits.length) return '';
+  return `<div style="font-size:12px;font-weight:700;margin-bottom:7px;color:var(--ink-700)">术语对照（${hits.length} 项）</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${hits.slice(0,14).map(h=>`<span class="tag">${esc(h.zh)} → ${esc(h.en)}</span>`).join('')}
+    </div>`;
+}
+function buildE2CDetail(raw){
+  const hits = [];
+  EN_SYMPTOMS.forEach(([re,zh])=>{ if(re.test(raw)) hits.push({en:(raw.match(re)||[''])[0], zh}); });
+  EN_VERBS.forEach(([re,zh])=>{ if(re.test(raw)) hits.push({en:(raw.match(re)||[''])[0], zh}); });
+  if(!hits.length) return '';
+  return `<div style="font-size:12px;font-weight:700;margin-bottom:7px;color:var(--ink-700)">识别到的医学表达（${hits.length} 项）</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${hits.slice(0,12).map(h=>`<span class="tag">${esc(h.en.trim())} → ${esc(h.zh)}</span>`).join('')}
+    </div>`;
+}
+function saveTransToVault(h){
+  const title = (transDir==='c2e'||h.dir==='c2e')
+    ? '医疗翻译 · ' + (h.src.length>22?h.src.slice(0,22)+'…':h.src)
+    : 'Medical Translation · ' + (h.src.length>22?h.src.slice(0,22)+'…':h.src);
+  const body = h.dir==='c2e'
+    ? `【中文原文】\n${h.src}\n\n【地道医学英文】\n${h.res}\n\n【译法】${h.method||'医学术语对照'}`
+    : `【English】\n${h.src}\n\n【中文译文】\n${h.res}\n\n【译法】${h.method||'医学术语对照'}`;
+  DB.vault.unshift({
+    id: uid(), title, cat: '医学翻译',
+    tags: ['医学英语','翻译', h.dir==='c2e'?'中译英':'英译中'],
+    body, ts: nowTs()
+  });
+  save();
+  toast('已保存到思维库 · 分类「医学翻译」');
+}
+
+/* ==========================================================================
+   模块三：临床医疗
+   ========================================================================== */
+let clinicTab = 'drugs';
+function renderClinic(){
+  $('#p-clinic').innerHTML = `
+    <div class="secHead"><div><h2>临床医疗</h2><p>常用辅助工具与快速参考</p></div></div>
+    <div class="seg">
+      <button data-tab="drugs" class="${clinicTab==='drugs'?'active':''}">药物查询</button>
+      <button data-tab="orders" class="${clinicTab==='orders'?'active':''}">医嘱模板</button>
+      <button data-tab="dx" class="${clinicTab==='dx'?'active':''}">诊断思维</button>
+    </div>
+    <div id="clinicBody"></div>`;
+  $$('#p-clinic .seg button').forEach(b=>b.onclick=()=>{ clinicTab=b.dataset.tab; renderClinic(); });
+  if(clinicTab==='drugs') renderDrugs();
+  else if(clinicTab==='orders') renderOrders();
+  else renderDx();
+}
+function renderDrugs(){
+  const body=$('#clinicBody');
+  body.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:11px">
+      <input class="inp" id="drugSearch" placeholder="检索药名 / 分类 / 适应症…" style="flex:1">
+      <button class="btn primary sm" id="addDrug">${svg('plus')}录入</button>
+    </div>
+    <div id="drugList">
+      ${DB.drugs.length?DB.drugs.map(drugHTML).join(''):`<div class="empty"><div class="eIco">${svg('pill')}</div><p>还没有药物记录</p></div>`}
+    </div>`;
+  $('#addDrug').onclick=()=>drugEditor(null);
+  $('#drugSearch').oninput=e=>{
+    const q=e.target.value.trim().toLowerCase();
+    const f=DB.drugs.filter(d=>!q||[d.name,d.alias,d.cls,d.adult,d.contra,d.caution].join(' ').toLowerCase().includes(q));
+    $('#drugList').innerHTML = f.length?f.map(drugHTML).join(''):`<div class="empty"><div class="eIco">${svg('search')}</div><p>未找到相关药物</p></div>`;
+    bindDrugs();
+  };
+  bindDrugs();
+}
+function drugHTML(d){
+  return `<div class="item" data-id="${d.id}">
+    <div class="itemHead">
+      <div class="itemMb" data-open>
+        <div class="itemTitle">${esc(d.name)} <span style="font-size:11px;color:var(--ink-300);font-weight:500">${esc(d.alias||'')}</span></div>
+        <div class="itemMeta">
+          ${d.cls?`<span class="tag">${esc(d.cls)}</span>`:''}
+          ${d.spec?`<span class="tag gray">${esc(d.spec)}</span>`:''}
+        </div>
+        ${d.adult?`<div class="itemSub" style="margin-top:6px">成人：${esc(d.adult)}</div>`:''}
+      </div>
+      <button class="iconBtn del" data-del>${svg('trash')}</button>
+    </div>
+  </div>`;
+}
+function bindDrugs(){
+  $$('#drugList .item').forEach(el=>{
+    const d=DB.drugs.find(x=>x.id===el.dataset.id); if(!d) return;
+    el.querySelector('[data-open]').onclick=()=>drugEditor(d);
+    el.querySelector('[data-del]').onclick=()=>{ DB.drugs=DB.drugs.filter(x=>x.id!==d.id); save(); renderDrugs(); toast('已删除'); };
+  });
+}
+function drugEditor(d){
+  const isNew=!d; const v=d||{};
+  openSheet(`
+    <div class="sheetTitle">${isNew?'录入药物':'药物详情'}</div>
+    <div class="sheetDesc">填写常用基础信息，便于临床快速检索。</div>
+    <div class="field"><label>药品名称</label><input class="inp" id="dN" value="${esc(v.name||'')}" placeholder="阿莫西林"></div>
+    <div class="field"><label>英文名 / 别名</label><input class="inp" id="dA" value="${esc(v.alias||'')}" placeholder="Amoxicillin"></div>
+    <div class="field"><label>药物分类</label><input class="inp" id="dC" value="${esc(v.cls||'')}" placeholder="青霉素类抗生素"></div>
+    <div class="field"><label>规格</label><input class="inp" id="dSp" value="${esc(v.spec||'')}" placeholder="0.25 g / 胶囊"></div>
+    <div class="field"><label>成人用法用量</label><textarea class="inp" id="dAd" rows="2" placeholder="口服 0.5 g，每 6–8 小时一次">${esc(v.adult||'')}</textarea></div>
+    <div class="field"><label>儿童用法用量</label><textarea class="inp" id="dCh" rows="2" placeholder="20–40 mg/kg/日，分 3 次">${esc(v.child||'')}</textarea></div>
+    <div class="field"><label>禁忌</label><textarea class="inp" id="dCt" rows="2" placeholder="青霉素过敏者禁用">${esc(v.contra||'')}</textarea></div>
+    <div class="field"><label>注意事项</label><textarea class="inp" id="dCa" rows="3" placeholder="用药前须做皮试…">${esc(v.caution||'')}</textarea></div>
+    <div class="row" style="margin-top:14px">
+      ${isNew?'':`<button class="btn ghost" id="dDl">${svg('trash')}删除</button>`}
+      <button class="btn primary" id="dSv">保存</button></div>`);
+  $('#dSv').onclick=()=>{
+    const name=$('#dN').value.trim(); if(!name){ toast('请填写药品名称'); return; }
+    const p={name,alias:$('#dA').value.trim(),cls:$('#dC').value.trim(),spec:$('#dSp').value.trim(),
+      adult:$('#dAd').value.trim(),child:$('#dCh').value.trim(),contra:$('#dCt').value.trim(),caution:$('#dCa').value.trim()};
+    if(isNew) DB.drugs.unshift({id:uid(),...p,ts:nowTs()}); else Object.assign(d,p);
+    save(); closeSheet(); renderDrugs(); toast(isNew?'已录入药物':'已保存');
+  };
+  if(!isNew) $('#dDl').onclick=()=>{ DB.drugs=DB.drugs.filter(x=>x.id!==d.id); save(); closeSheet(); renderDrugs(); toast('已删除'); };
+}
+function renderOrders(){
+  const body=$('#clinicBody');
+  body.innerHTML=`
+    <div class="secHead" style="margin:2px 2px 10px">
+      <div><p style="margin:0">保存常用医嘱，一键调取复制</p></div>
+      <button class="btn primary sm" id="addOrd">${svg('plus')}新增</button>
+    </div>
+    ${DB.orders.length?DB.orders.map(o=>`
+      <div class="item" data-id="${o.id}">
+        <div class="itemHead">
+          <div class="itemMb" data-open><div class="itemTitle">${esc(o.name)}</div></div>
+          <button class="iconBtn del" data-del>${svg('trash')}</button>
+        </div>
+        <div class="out" style="margin-top:9px;font-size:12.5px">${esc(o.body)}</div>
+        <div class="row" style="margin-top:9px">
+          <button class="btn sm ghost" data-copy>${svg('file')}复制医嘱</button>
+          <button class="btn sm" data-open>编辑</button>
+        </div>
+      </div>`).join(''):`<div class="empty"><div class="eIco">${svg('note')}</div><p>还没有医嘱模板</p></div>`}`;
+  $('#addOrd').onclick=()=>orderEditor(null);
+  $$('#clinicBody .item').forEach(el=>{
+    const o=DB.orders.find(x=>x.id===el.dataset.id); if(!o) return;
+    el.querySelector('[data-open]').onclick=()=>orderEditor(o);
+    el.querySelector('[data-del]').onclick=()=>{ DB.orders=DB.orders.filter(x=>x.id!==o.id); save(); renderOrders(); toast('已删除'); };
+    el.querySelector('[data-copy]').onclick=()=>copyText(o.body,'医嘱已复制');
+  });
+}
+function orderEditor(o){
+  const isNew=!o;
+  openSheet(`
+    <div class="sheetTitle">${isNew?'新增医嘱模板':'编辑医嘱模板'}</div>
+    <div class="sheetDesc">每行一条医嘱，保存后可随时调取复制。</div>
+    <div class="field"><label>模板名称</label><input class="inp" id="oN" value="${esc(o?o.name:'')}" placeholder="社区获得性肺炎医嘱"></div>
+    <div class="field"><label>医嘱内容</label><textarea class="inp" id="oB" rows="8" placeholder="呼吸内科护理常规&#10;阿莫西林克拉维酸钾 1.2 g ivgtt q8h">${o?esc(o.body):''}</textarea></div>
+    <div class="row" style="margin-top:14px">
+      ${isNew?'':`<button class="btn ghost" id="oDl">${svg('trash')}删除</button>`}
+      <button class="btn primary" id="oSv">保存</button></div>`);
+  $('#oSv').onclick=()=>{
+    const name=$('#oN').value.trim(), bodyV=$('#oB').value.trim();
+    if(!name||!bodyV){ toast('请填写名称与内容'); return; }
+    if(isNew) DB.orders.unshift({id:uid(),name,body:bodyV,ts:nowTs()});
+    else Object.assign(o,{name,body:bodyV});
+    save(); closeSheet(); renderOrders(); toast(isNew?'已新增模板':'已保存');
+  };
+  if(!isNew) $('#oDl').onclick=()=>{ DB.orders=DB.orders.filter(x=>x.id!==o.id); save(); closeSheet(); renderOrders(); toast('已删除'); };
+}
+function renderDx(){
+  const body=$('#clinicBody');
+  const cats=['全部',...new Set(DB.dxflows.map(d=>d.cat).filter(Boolean))];
+  if(!cats.includes(dxCats)) dxCats='全部';
+  const list = dxCats==='全部'?DB.dxflows:DB.dxflows.filter(d=>d.cat===dxCats);
+  body.innerHTML=`
+    <div class="secHead" style="margin:2px 2px 10px">
+      <div><p style="margin:0">全科诊断思维流程，临床快速参考</p></div>
+      <button class="btn primary sm" id="addDx">${svg('plus')}录入</button>
+    </div>
+    <div class="chipBar">${cats.map(c=>`<button class="chip${dxCats===c?' active':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+    ${list.length?list.map(d=>`
+      <div class="item" data-id="${d.id}">
+        <div class="itemHead">
+          <div class="itemMb" data-open>
+            <div class="itemTitle">${esc(d.name)}</div>
+            ${d.cat?`<div class="itemMeta"><span class="tag">${esc(d.cat)}</span></div>`:''}
+          </div>
+          <button class="iconBtn del" data-del>${svg('trash')}</button>
+        </div>
+        <div class="out" style="margin-top:9px;font-size:12.5px">${esc(d.body)}</div>
+      </div>`).join(''):`<div class="empty"><div class="eIco">${svg('stethoscope')}</div><p>暂无诊断思维记录</p></div>`}`;
+  $('#addDx').onclick=()=>dxEditor(null);
+  $$('#clinicBody .chip').forEach(c=>c.onclick=()=>{ dxCats=c.dataset.c; renderDx(); });
+  $$('#clinicBody .item').forEach(el=>{
+    const d=DB.dxflows.find(x=>x.id===el.dataset.id); if(!d) return;
+    el.querySelector('[data-open]').onclick=()=>dxEditor(d);
+    el.querySelector('[data-del]').onclick=()=>{ DB.dxflows=DB.dxflows.filter(x=>x.id!==d.id); save(); renderDx(); toast('已删除'); };
+  });
+}
+let dxCats='全部';
+function dxEditor(d){
+  const isNew=!d;
+  openSheet(`
+    <div class="sheetTitle">${isNew?'录入诊断思维':'编辑诊断思维'}</div>
+    <div class="sheetDesc">按步骤记录诊断思路，建议逐条分行，临床时可快速扫读。</div>
+    <div class="field"><label>名称</label><input class="inp" id="xN" value="${esc(d?d.name:'')}" placeholder="胸痛诊断思路"></div>
+    <div class="field"><label>分类</label><input class="inp" id="xC" value="${esc(d?d.cat:'')}" placeholder="心血管 / 呼吸 / 全科"></div>
+    <div class="field"><label>思维流程</label><textarea class="inp" id="xB" rows="9" placeholder="① 首先排除致命性病因…&#10;② 问诊要点…&#10;③ 辅助检查…">${d?esc(d.body):''}</textarea></div>
+    <div class="row" style="margin-top:14px">
+      ${isNew?'':`<button class="btn ghost" id="xDl">${svg('trash')}删除</button>`}
+      <button class="btn primary" id="xSv">保存</button></div>`);
+  $('#xSv').onclick=()=>{
+    const name=$('#xN').value.trim(), bodyV=$('#xB').value.trim();
+    if(!name||!bodyV){ toast('请填写名称与内容'); return; }
+    if(isNew) DB.dxflows.unshift({id:uid(),name,cat:$('#xC').value.trim()||'全科',body:bodyV,ts:nowTs()});
+    else Object.assign(d,{name,cat:$('#xC').value.trim()||'全科',body:bodyV});
+    save(); closeSheet(); renderDx(); toast(isNew?'已录入':'已保存');
+  };
+  if(!isNew) $('#xDl').onclick=()=>{ DB.dxflows=DB.dxflows.filter(x=>x.id!==d.id); save(); closeSheet(); renderDx(); toast('已删除'); };
+}
+function copyText(txt,msg){
+  const done=()=>toast(msg||'已复制');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(()=>fallback());
+  } else fallback();
+  function fallback(){
+    const ta=document.createElement('textarea'); ta.value=txt;
+    ta.style.cssText='position:fixed;opacity:0'; document.body.appendChild(ta);
+    ta.select(); try{ document.execCommand('copy'); done(); }catch(e){ toast('复制失败，请手动选择'); }
+    document.body.removeChild(ta);
+  }
+}
+
+/* ==========================================================================
+   模块四：科研训练
+   ========================================================================== */
+let resTab='lib';
+function renderResearch(){
+  $('#p-research').innerHTML=`
+    <div class="secHead"><div><h2>科研训练</h2><p>文献处理与统计学工具</p></div></div>
+    <div class="seg">
+      <button data-tab="lib" class="${resTab==='lib'?'active':''}">文献笔记</button>
+      <button data-tab="trans" class="${resTab==='trans'?'active':''}">翻译入口</button>
+      <button data-tab="stat" class="${resTab==='stat'?'active':''}">统计工具</button>
+    </div>
+    <div id="resBody"></div>`;
+  $$('#p-research .seg button').forEach(b=>b.onclick=()=>{ resTab=b.dataset.tab; renderResearch(); });
+  if(resTab==='lib') renderRefs();
+  else if(resTab==='trans') renderTrans();
+  else renderStat();
+}
+function renderRefs(){
+  const body=$('#resBody');
+  const cats=['全部',...new Set(DB.refs.map(r=>r.cat).filter(Boolean))];
+  if(!cats.includes(refCat)) refCat='全部';
+  const list=refCat==='全部'?DB.refs:DB.refs.filter(r=>r.cat===refCat);
+  body.innerHTML=`
+    <div class="secHead" style="margin:2px 2px 10px">
+      <div><p style="margin:0">录入文献，标记重点并保存笔记</p></div>
+      <button class="btn primary sm" id="addRef">${svg('plus')}录入</button>
+    </div>
+    <div class="chipBar">${cats.map(c=>`<button class="chip${refCat===c?' active':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+    <div style="display:flex;gap:8px;margin:2px 2px 10px">
+      <input class="inp" id="refSearch" placeholder="检索标题 / 作者 / 摘要…" style="flex:1">
+    </div>
+    <div id="refList">
+      ${list.length?list.map(refHTML).join(''):`<div class="empty"><div class="eIco">${svg('file')}</div><p>暂无文献笔记</p></div>`}
+    </div>`;
+  $('#addRef').onclick=()=>refEditor(null);
+  $$('#resBody .chip').forEach(c=>c.onclick=()=>{ refCat=c.dataset.c; renderRefs(); });
+  $('#refSearch').oninput=e=>{
+    const q=e.target.value.trim().toLowerCase();
+    const f=(refCat==='全部'?DB.refs:DB.refs.filter(r=>r.cat===refCat))
+      .filter(r=>!q||[r.title,r.authors,r.abstract,r.highlight,r.note].join(' ').toLowerCase().includes(q));
+    $('#refList').innerHTML=f.length?f.map(refHTML).join(''):`<div class="empty"><div class="eIco">${svg('search')}</div><p>未找到相关文献</p></div>`;
+    bindRefs();
+  };
+  bindRefs();
+}
+let refCat='全部';
+function refHTML(r){
+  return `<div class="item" data-id="${r.id}">
+    <div class="itemHead">
+      <div class="itemMb" data-open>
+        <div class="itemTitle">${esc(r.title)}</div>
+        <div class="itemMeta">
+          ${r.cat?`<span class="tag">${esc(r.cat)}</span>`:''}
+          ${r.year?`<span class="tag gray">${esc(r.year)}</span>`:''}
+          ${r.highlight?`<span class="tag warn">已标重点</span>`:''}
+        </div>
+        ${r.authors?`<div class="itemSub" style="margin-top:5px">${esc(r.authors)}</div>`:''}
+      </div>
+      <button class="iconBtn del" data-del>${svg('trash')}</button>
+    </div>
+  </div>`;
+}
+function bindRefs(){
+  $$('#refList .item').forEach(el=>{
+    const r=DB.refs.find(x=>x.id===el.dataset.id); if(!r) return;
+    el.querySelector('[data-open]').onclick=()=>refEditor(r);
+    el.querySelector('[data-del]').onclick=()=>{ DB.refs=DB.refs.filter(x=>x.id!==r.id); save(); renderRefs(); toast('已删除'); };
+  });
+}
+function refEditor(r){
+  const isNew=!r; const v=r||{};
+  openSheet(`
+    <div class="sheetTitle">${isNew?'录入文献':'文献笔记'}</div>
+    <div class="sheetDesc">录入文献信息，可标记重点并保存摘要笔记。</div>
+    <div class="field"><label>文献标题</label><textarea class="inp" id="rT" rows="2" placeholder="Title of the article">${esc(v.title||'')}</textarea></div>
+    <div class="row">
+      <div class="field"><label>作者</label><input class="inp" id="rA" value="${esc(v.authors||'')}" placeholder="Smith J, et al."></div>
+      <div class="field" style="max-width:96px"><label>年份</label><input class="inp" id="rY" value="${esc(v.year||'')}" placeholder="2024"></div>
+    </div>
+    <div class="field"><label>分类</label><input class="inp" id="rC" value="${esc(v.cat||'')}" placeholder="心血管 / 呼吸内科" list="refCatDl">
+      <datalist id="refCatDl">${[...new Set(DB.refs.map(x=>x.cat).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('')}</datalist></div>
+    <div class="field"><label>摘要 / 内容</label><textarea class="inp" id="rAb" rows="5" placeholder="粘贴摘要或整理内容…">${esc(v.abstract||'')}</textarea></div>
+    <div class="field"><label>重点标记</label><textarea class="inp" id="rH" rows="3" placeholder="关键结论、统计结果、需记忆数据…">${esc(v.highlight||'')}</textarea></div>
+    <div class="field"><label>我的笔记</label><textarea class="inp" id="rN" rows="3" placeholder="个人思考、可借鉴之处…">${esc(v.note||'')}</textarea></div>
+    <div class="row" style="margin-top:14px">
+      ${isNew?'':`<button class="btn ghost" id="rDl">${svg('trash')}删除</button>`}
+      <button class="btn primary" id="rSv">保存</button></div>`);
+  $('#rSv').onclick=()=>{
+    const title=$('#rT').value.trim(); if(!title){ toast('请填写文献标题'); return; }
+    const p={title,authors:$('#rA').value.trim(),year:$('#rY').value.trim(),cat:$('#rC').value.trim()||'未分类',
+      abstract:$('#rAb').value.trim(),highlight:$('#rH').value.trim(),note:$('#rN').value.trim()};
+    if(isNew) DB.refs.unshift({id:uid(),...p,ts:nowTs()}); else Object.assign(r,p);
+    save(); closeSheet(); renderRefs(); toast(isNew?'已录入文献':'已保存笔记');
+  };
+  if(!isNew) $('#rDl').onclick=()=>{ DB.refs=DB.refs.filter(x=>x.id!==r.id); save(); closeSheet(); renderRefs(); toast('已删除'); };
+}
+const TRANS_SITES=[
+  {name:'DeepL 翻译', desc:'医学表述自然，专业术语准确', url:'https://www.deepl.com/translator'},
+  {name:'PubMed', desc:'全球医学文献数据库，支持高级检索', url:'https://pubmed.ncbi.nlm.nih.gov/'},
+  {name:'Google 学术', desc:'跨库检索文献、引用与综述', url:'https://scholar.google.com/'},
+  {name:'CNKI 翻译助手', desc:'中英医学词条对照，适合专业名词', url:'https://dict.cnki.net/'},
+  {name:'有道翻译', desc:'中英互译，支持整段文本', url:'https://fanyi.youdao.com/'},
+  {name:'ClinicalTrials.gov', desc:'临床试验注册信息查询', url:'https://clinicaltrials.gov/'}
+];
+function renderTrans(){
+  $('#resBody').innerHTML=`
+    <div class="card tint">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">快速翻译</div>
+      <div class="hint" style="margin:0 0 10px">粘贴英文原文，一键跳转翻译工具。原文本地保存，不会上传。</div>
+      <textarea class="inp" id="transIn" rows="6" placeholder="Paste the English abstract here…"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary sm" id="transGo">${svg('language')}跳转翻译</button>
+        <button class="btn ghost sm" id="transSave">${svg('file')}存为文献</button>
+      </div>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;margin:14px 2px 9px;color:var(--ink-700)">常用文献与翻译入口</div>
+    ${TRANS_SITES.map(s=>`
+      <div class="item" style="padding:11px 13px">
+        <div class="itemHead">
+          <div class="itemMb">
+            <div class="itemTitle" style="font-size:13.5px">${esc(s.name)}</div>
+            <div class="itemSub" style="margin-top:2px">${esc(s.desc)}</div>
+          </div>
+          <button class="iconBtn" data-url="${esc(s.url)}" title="打开">${svg('play')}</button>
+        </div>
+      </div>`).join('')}
+    <div class="hint" style="margin:10px 2px 0">提示：若页面在受限环境打开，外部链接可能被拦截，可复制网址在浏览器中访问。</div>`;
+  $('#transGo').onclick=()=>{
+    const txt=$('#transIn').value.trim();
+    if(txt) copyText(txt,'原文已复制，已跳转翻译页面');
+    window.open('https://www.deepl.com/translator','_blank','noopener');
+  };
+  $('#transSave').onclick=()=>{
+    const txt=$('#transIn').value.trim();
+    if(!txt){ toast('请先粘贴内容'); return; }
+    DB.refs.unshift({id:uid(),title:txt.slice(0,40),authors:'',year:'',cat:'待读文献',abstract:txt,highlight:'',note:'',ts:nowTs()});
+    save(); toast('已保存到文献笔记'); renderResearch();
+  };
+  $$('#resBody [data-url]').forEach(b=>b.onclick=()=>window.open(b.dataset.url,'_blank','noopener'));
+}
+
+/* ---- 统计学工具 ---- */
+function renderStat(){
+  $('#resBody').innerHTML=`
+    <div class="seg" id="statSeg" style="margin-bottom:12px">
+      <button class="active" data-m="desc">描述统计</button>
+      <button data-m="ttest">t 检验</button>
+      <button data-m="chi">卡方检验</button>
+      <button data-m="corr">相关分析</button>
+    </div>
+    <div class="card" id="statCard"></div>
+    <div class="hint" style="margin:0 2px">用于科研快速估算，结果保留 4 位有效数字。正式结论请使用 SPSS / R 等专业软件复核。</div>`;
+  $$('#statSeg button').forEach(b=>b.onclick=()=>{
+    $$('#statSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); statMode(b.dataset.m);
+  });
+  statMode('desc');
+}
+function statMode(m){
+  const c=$('#statCard');
+  if(m==='desc'){
+    c.innerHTML=`<div style="font-size:13.5px;font-weight:700;margin-bottom:4px">描述性统计</div>
+      <div class="hint" style="margin:0 0 10px">输入一组数值，用逗号、空格或换行分隔</div>
+      <textarea class="inp" id="sdIn" rows="4" placeholder="12.4, 13.1, 11.8, 14.2, 12.9">12.4, 13.1, 11.8, 14.2, 12.9, 13.7, 11.5</textarea>
+      <button class="btn primary block sm" style="margin-top:10px" id="sdGo">${svg('chart')}计算</button>
+      <div id="sdOut" style="margin-top:12px"></div>`;
+    $('#sdGo').onclick=()=>{
+      const a=parseNums($('#sdIn').value); if(a.length<2){ toast('至少输入 2 个数值'); return; }
+      const s=descStats(a);
+      $('#sdOut').innerHTML=`<div class="out">${kvHTML([
+        ['样本量 n', s.n],['均值 Mean', f(s.mean)],['标准差 SD', f(s.sd)],
+        ['中位数 Median', f(s.median)],['最小值 / 最大值', f(s.min)+' / '+f(s.max)],
+        ['标准误 SEM', f(s.sem)],['四分位距 IQR', f(s.q1)+' ~ '+f(s.q3)],
+        ['95% 置信区间', f(s.ci[0])+' ~ '+f(s.ci[1])]
+      ])}</div>`;
+    };
+    $('#sdGo').click();
+  }
+  else if(m==='ttest'){
+    c.innerHTML=`<div style="font-size:13.5px;font-weight:700;margin-bottom:4px">独立样本 t 检验</div>
+      <div class="hint" style="margin:0 0 10px">分别输入两组数据，自动判断方差齐性与检验方法</div>
+      <div class="field"><label>组 1</label><textarea class="inp" id="t1" rows="3" placeholder="12.4, 13.1, 11.8">12.4, 13.1, 11.8, 14.2, 12.9, 13.7</textarea></div>
+      <div class="field"><label>组 2</label><textarea class="inp" id="t2" rows="3" placeholder="10.2, 9.8, 11.1">10.2, 9.8, 11.1, 10.5, 9.9, 10.8</textarea></div>
+      <button class="btn primary block sm" id="tGo">${svg('chart')}计算 t 值与 P 值</button>
+      <div id="tOut" style="margin-top:12px"></div>`;
+    $('#tGo').onclick=()=>{
+      const a=parseNums($('#t1').value), b=parseNums($('#t2').value);
+      if(a.length<2||b.length<2){ toast('每组至少 2 个数值'); return; }
+      const r=ttest(a,b);
+      $('#tOut').innerHTML=`<div class="out">${kvHTML([
+        ['样本量', `n₁=${a.length}  n₂=${b.length}`],
+        ['均值', `M₁=${f(r.m1)}   M₂=${f(r.m2)}`],
+        ['标准差', `SD₁=${f(r.s1)}  SD₂=${f(r.s2)}`],
+        ['均数差 (M₁−M₂)', f(r.m1-r.m2)],
+        ['t 值', f(r.t)],
+        ['自由度 df', f(r.df)],
+        ['P 值（双尾）', r.p<0.001?'<0.001':f(r.p)],
+        ['结论', r.p<0.05?'<b>差异有统计学意义 (P&lt;0.05)</b>':'差异无统计学意义 (P≥0.05)']
+      ])}</div>`;
+    };
+    $('#tGo').click();
+  }
+  else if(m==='chi'){
+    c.innerHTML=`<div style="font-size:13.5px;font-weight:700;margin-bottom:4px">卡方检验 (2×2 四格表)</div>
+      <div class="hint" style="margin:0 0 10px">输入四个格子频数，自动计算 χ² 与 P 值</div>
+      <div class="row"><div class="field"><label>a（暴露+ 结局+）</label><input class="inp" id="ca" value="30" inputmode="numeric"></div>
+      <div class="field"><label>b（暴露+ 结局−）</label><input class="inp" id="cb" value="20" inputmode="numeric"></div></div>
+      <div class="row"><div class="field"><label>c（暴露− 结局+）</label><input class="inp" id="cc" value="15" inputmode="numeric"></div>
+      <div class="field"><label>d（暴露− 结局−）</label><input class="inp" id="cd" value="35" inputmode="numeric"></div></div>
+      <button class="btn primary block sm" id="cGo">${svg('chart')}计算 χ² 与 P 值</button>
+      <div id="cOut" style="margin-top:12px"></div>`;
+    $('#cGo').onclick=()=>{
+      const a=+$('#ca').value||0,b=+$('#cb').value||0,cc=+$('#cc').value||0,d=+$('#cd').value||0;
+      if(a+b+cc+d<=0){ toast('请输入有效频数'); return; }
+      const r=chi2(a,b,cc,d);
+      $('#cOut').innerHTML=`<div class="out">${kvHTML([
+        ['χ² 值（校正）', f(r.chi2)],
+        ['自由度 df', '1'],
+        ['P 值', r.p<0.001?'<0.001':f(r.p)],
+        ['暴露组发生率', pct(a/(a+b||1))],
+        ['对照组发生率', pct(cc/(cc+d||1))],
+        ['OR 值', f(r.or)],
+        ['RR 值', f(r.rr)],
+        ['结论', r.p<0.05?'<b>两组差异有统计学意义 (P&lt;0.05)</b>':'两组差异无统计学意义 (P≥0.05)']
+      ])}</div>`;
+    };
+    $('#cGo').click();
+  }
+  else{
+    c.innerHTML=`<div style="font-size:13.5px;font-weight:700;margin-bottom:4px">Pearson 相关分析</div>
+      <div class="hint" style="margin:0 0 10px">输入两组等长数据，计算相关系数 r 与 P 值</div>
+      <div class="field"><label>变量 X</label><textarea class="inp" id="px" rows="3">1, 2, 3, 4, 5, 6, 7, 8</textarea></div>
+      <div class="field"><label>变量 Y</label><textarea class="inp" id="py" rows="3">2.1, 3.9, 6.2, 8.1, 9.8, 12.2, 13.9, 16.1</textarea></div>
+      <button class="btn primary block sm" id="pGo">${svg('chart')}计算 r 与 P 值</button>
+      <div id="pOut" style="margin-top:12px"></div>`;
+    $('#pGo').onclick=()=>{
+      const x=parseNums($('#px').value), y=parseNums($('#py').value);
+      if(x.length<3||x.length!==y.length){ toast('两组数据数量需一致且 ≥3'); return; }
+      const r=pearson(x,y);
+      $('#pOut').innerHTML=`<div class="out">${kvHTML([
+        ['样本量 n', r.n],
+        ['相关系数 r', f(r.r)],
+        ['决定系数 R²', f(r.r*r.r)],
+        ['t 值', f(r.t)],
+        ['P 值', r.p<0.001?'<0.001':f(r.p)],
+        ['相关强度', strength(r.r)],
+        ['结论', r.p<0.05?'<b>存在统计学显著相关 (P&lt;0.05)</b>':'相关无统计学意义 (P≥0.05)']
+      ])}</div>`;
+    };
+    $('#pGo').click();
+  }
+}
+function kvHTML(rows){ return rows.map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><span>${v}</span></div>`).join(''); }
+function f(v,d){ if(!isFinite(v)) return '—'; const n=Math.abs(v); if(n>=1e6||(n<0.001&&n>0)) return v.toExponential(3); return (+v.toFixed(d??4))+' '; }
+function pct(v){ return (v*100).toFixed(2)+'%'; }
+function parseNums(s){
+  return String(s).split(/[\s,，、;；\n\t]+/).map(v=>v.trim()).filter(Boolean)
+    .map(Number).filter(v=>!isNaN(v));
+}
+function descStats(a){
+  const n=a.length, sorted=[...a].sort((x,y)=>x-y);
+  const mean=a.reduce((s,v)=>s+v,0)/n;
+  const sd=Math.sqrt(a.reduce((s,v)=>s+(v-mean)**2,0)/(n-1||1));
+  const sem=sd/Math.sqrt(n);
+  const median=n%2?sorted[(n-1)/2]:(sorted[n/2-1]+sorted[n/2])/2;
+  const q=p=>{ const pos=(n-1)*p, lo=Math.floor(pos), hi=Math.ceil(pos); return sorted[lo]+(sorted[hi]-sorted[lo])*(pos-lo); };
+  const q1=q(.25), q3=q(.75);
+  return {n,mean,sd,sem,median,min:sorted[0],max:sorted[n-1],q1,q3,ci:[mean-1.96*sem, mean+1.96*sem]};
+}
+/* 正态分布 CDF（Abramowitz-Stegun 近似） */
+function normCdf(z){
+  const t=1/(1+0.2316419*Math.abs(z));
+  const d=0.3989423*Math.exp(-z*z/2);
+  let p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));
+  return z>0 ? 1-p : p;
+}
+function tCdf(t,df){
+  const x = df/(df+t*t);
+  const p = 0.5*betainc(x, df/2, 0.5);
+  return t>0 ? 1-p : p;
+}
+function betainc(x,a,b){
+  if(x<=0) return 0; if(x>=1) return 1;
+  const lbeta = lgamma(a)+lgamma(b)-lgamma(a+b);
+  const front = Math.exp(Math.log(x)*a + Math.log(1-x)*b - lbeta)/a;
+  let f=1, c=1, d=0;
+  for(let i=0;i<=200;i++){
+    const m=Math.floor(i/2);
+    let num;
+    if(i===0) num=1;
+    else if(i%2===0) num=(m*(b-m)*x)/((a+2*m-1)*(a+2*m));
+    else num=-((a+m)*(a+b+m)*x)/((a+2*m)*(a+2*m+1));
+    d = 1+num*d; if(Math.abs(d)<1e-30) d=1e-30; d=1/d;
+    c = 1+num/c; if(Math.abs(c)<1e-30) c=1e-30;
+    f *= c*d;
+    if(Math.abs(1-c*d)<1e-10) break;
+  }
+  return front*(f-1);
+}
+const LG=[676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+function lgamma(z){
+  if(z<0.5) return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z);
+  z-=1; let x=0.99999999999980993;
+  for(let i=0;i<8;i++) x+=LG[i]/(z+i+1);
+  const t=z+7.5;
+  return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);
+}
+function ttest(a,b){
+  const n1=a.length,n2=b.length;
+  const m1=a.reduce((s,v)=>s+v,0)/n1, m2=b.reduce((s,v)=>s+v,0)/n2;
+  const v1=a.reduce((s,v)=>s+(v-m1)**2,0)/(n1-1||1);
+  const v2=b.reduce((s,v)=>s+(v-m2)**2,0)/(n2-1||1);
+  const s1=Math.sqrt(v1), s2=Math.sqrt(v2);
+  const sp2=((n1-1)*v1+(n2-1)*v2)/(n1+n2-2||1);
+  const se=Math.sqrt(sp2*(1/n1+1/n2));
+  const t=(m1-m2)/(se||1e-12);
+  const df=n1+n2-2;
+  const p=2*(1-tCdf(Math.abs(t),df));
+  return {m1,m2,s1,s2,t,df,p:Math.max(0,Math.min(1,p))};
+}
+function chi2(a,b,c,d){
+  const n=a+b+c+d;
+  const chi2c = n*Math.pow(Math.abs(a*d-b*c)-n/2,2)/((a+b)*(c+d)*(a+c)*(b+d)||1);
+  const p = chi2c>0 ? 1-chi2Cdf(chi2c,1) : 1;
+  const or = (b*c)===0 ? Infinity : (a*d)/(b*c);
+  const rr = (a/(a+b||1))/((c/(c+d))||1e-12);
+  return {chi2:chi2c,p:Math.max(0,Math.min(1,p)),or,rr};
+}
+function chi2Cdf(x,df){
+  if(x<=0) return 0;
+  if(df===1){
+    const z=Math.sqrt(x);
+    return 2*normCdf(z)-1;
+  }
+  return 1-Math.exp(-x/2);
+}
+function pearson(x,y){
+  const n=x.length;
+  const mx=x.reduce((s,v)=>s+v,0)/n, my=y.reduce((s,v)=>s+v,0)/n;
+  let sxy=0,sxx=0,syy=0;
+  for(let i=0;i<n;i++){ const dx=x[i]-mx, dy=y[i]-my; sxy+=dx*dy; sxx+=dx*dx; syy+=dy*dy; }
+  const r=sxy/Math.sqrt((sxx*syy)||1e-12);
+  const t=r*Math.sqrt((n-2)/Math.max(1e-12,1-r*r));
+  const p=2*(1-tCdf(Math.abs(t), n-2));
+  return {n,r,t,p:Math.max(0,Math.min(1,p))};
+}
+function strength(r){
+  const a=Math.abs(r);
+  if(a<0.3) return '弱相关';
+  if(a<0.5) return '低度相关';
+  if(a<0.8) return '中度相关';
+  return '强相关';
+}
+
+/* ==========================================================================
+   模块五：思维库
+   ========================================================================== */
+let vaultCat='全部', vaultTag=null, vaultQ='';
+function renderVault(){
+  const cats=['全部', ...new Set(DB.vault.map(v=>v.cat).filter(Boolean))];
+  if(!cats.includes(vaultCat)) vaultCat='全部';
+  const allTags=[...new Set(DB.vault.flatMap(v=>v.tags||[]))];
+  let list=DB.vault;
+  if(vaultCat!=='全部') list=list.filter(v=>v.cat===vaultCat);
+  if(vaultTag) list=list.filter(v=>(v.tags||[]).includes(vaultTag));
+  if(vaultQ){
+    const q=vaultQ.toLowerCase();
+    list=list.filter(v=>[v.title,v.body,(v.tags||[]).join(' '),v.cat].join(' ').toLowerCase().includes(q));
+  }
+  $('#p-vault').innerHTML=`
+    <div class="secHead">
+      <div><h2>思维库</h2><p>素材收纳 · 分类管理 · 标签检索</p></div>
+      <button class="btn primary sm" id="addV">${svg('plus')}录入</button>
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="stat"><div class="n">${DB.vault.length}</div><div class="l">素材总数</div></div>
+      <div class="stat"><div class="n">${new Set(DB.vault.flatMap(v=>v.tags||[])).size}</div><div class="l">标签数量</div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:11px">
+      <input class="inp" id="vSearch" value="${esc(vaultQ)}" placeholder="检索标题 / 正文 / 标签…" style="flex:1">
+    </div>
+    <div class="chipBar">${cats.map(c=>`<button class="chip${vaultCat===c?' active':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+    ${allTags.length?`<div class="chipBar" style="flex-wrap:wrap;overflow:visible">${allTags.map(t=>`<button class="chip${vaultTag===t?' active':''}" data-t="${esc(t)}">#${esc(t)}</button>`).join('')}</div>`:''}
+    ${list.length?list.map(vaultHTML).join(''):`<div class="empty"><div class="eIco">${svg('library')}</div><p>${DB.vault.length?'没有匹配的素材':'还没有素材，点「录入」添加'}</p></div>`}
+    <div class="card tint" style="margin-top:14px">
+      <div style="font-size:12.5px;font-weight:700;margin-bottom:7px;color:var(--pink-700)">备份与恢复</div>
+      <div class="row" style="margin-bottom:8px">
+        <button class="btn ghost sm" id="expBtn2">${svg('download')}导出 JSON</button>
+        <button class="btn ghost sm" id="impBtn2">${svg('upload')}导入恢复</button>
+      </div>
+      <div class="hint">导出文件包含全部模块数据（待办、单词、对话、药物、医嘱、文献、素材），可用于换设备或备份。</div>
+    </div>`;
+
+  $('#addV').onclick=()=>vaultEditor(null);
+  $('#vSearch').oninput=e=>{
+    vaultQ=e.target.value; clearTimeout(window.__vT);
+    window.__vT=setTimeout(()=>{ const s=$('#vSearch'); const p=s.selectionStart; renderVault(); const n=$('#vSearch'); n.focus(); try{n.setSelectionRange(p,p);}catch(_){} },260);
+  };
+  $$('#p-vault .chip').forEach(c=>c.onclick=()=>{
+    if(c.dataset.c!==undefined) vaultCat=c.dataset.c;
+    if(c.dataset.t!==undefined) vaultTag = (vaultTag===c.dataset.t?null:c.dataset.t);
+    renderVault();
+  });
+  bindVault();
+  bindBackup();
+}
+function vaultHTML(v){
+  return `<div class="item" data-id="${v.id}">
+    <div class="itemHead">
+      <div class="itemMb" data-open>
+        <div class="itemTitle">${esc(v.title)}</div>
+        <div class="itemSub" style="margin-top:4px">${esc((v.body||'').slice(0,80))}${(v.body||'').length>80?'…':''}</div>
+        <div class="itemMeta">
+          ${v.cat?`<span class="tag">${esc(v.cat)}</span>`:''}
+          ${(v.tags||[]).map(t=>`<span class="tag gray">#${esc(t)}</span>`).join('')}
+        </div>
+      </div>
+      <button class="iconBtn del" data-del>${svg('trash')}</button>
+    </div>
+  </div>`;
+}
+function bindVault(){
+  $$('#p-vault .item').forEach(el=>{
+    const v=DB.vault.find(x=>x.id===el.dataset.id); if(!v) return;
+    el.querySelector('[data-open]').onclick=()=>vaultEditor(v);
+    el.querySelector('[data-del]').onclick=()=>{ DB.vault=DB.vault.filter(x=>x.id!==v.id); save(); renderVault(); toast('已删除'); };
+  });
+}
+function vaultEditor(v){
+  const isNew=!v; const d=v||{};
+  const cats=[...new Set(DB.vault.map(x=>x.cat).filter(Boolean))];
+  const allTags=[...new Set(DB.vault.flatMap(x=>x.tags||[]))];
+  openSheet(`
+    <div class="sheetTitle">${isNew?'录入素材':'编辑素材'}</div>
+    <div class="sheetDesc">支持文字素材录入，可自定义分类与标签，便于日后检索。</div>
+    <div class="field"><label>标题</label><input class="inp" id="vT" value="${esc(d.title||'')}" placeholder="例如：室性早搏的良恶性判断要点"></div>
+    <div class="field"><label>分类</label><input class="inp" id="vC" value="${esc(d.cat||'')}" placeholder="心内科 / 临床技能" list="vCatDl">
+      <datalist id="vCatDl">${cats.map(c=>`<option value="${esc(c)}">`).join('')}</datalist></div>
+    <div class="field"><label>标签（逗号分隔）</label><input class="inp" id="vTg" value="${esc((d.tags||[]).join(', '))}" placeholder="心电图, 心律失常, 速查" list="vTagDl">
+      <datalist id="vTagDl">${allTags.map(t=>`<option value="${esc(t)}">`).join('')}</datalist></div>
+    <div class="field"><label>正文内容</label><textarea class="inp" id="vB" rows="9" placeholder="记录你的思考、速记、要点…">${esc(d.body||'')}</textarea></div>
+    <div class="row" style="margin-top:14px">
+      ${isNew?'':`<button class="btn ghost" id="vDl">${svg('trash')}删除</button>`}
+      ${isNew?'':`<button class="btn ghost" id="vCp">${svg('file')}复制</button>`}
+      <button class="btn primary" id="vSv">保存</button></div>`);
+  $('#vSv').onclick=()=>{
+    const title=$('#vT').value.trim(); if(!title){ toast('请填写标题'); return; }
+    const tags=$('#vTg').value.split(/[,，、]/).map(s=>s.trim()).filter(Boolean);
+    const p={title,cat:$('#vC').value.trim()||'未分类',tags,body:$('#vB').value.trim()};
+    if(isNew) DB.vault.unshift({id:uid(),...p,ts:nowTs()}); else Object.assign(v,p);
+    save(); closeSheet(); renderVault(); toast(isNew?'已录入素材':'已保存');
+  };
+  if(!isNew){
+    $('#vDl').onclick=()=>{ DB.vault=DB.vault.filter(x=>x.id!==v.id); save(); closeSheet(); renderVault(); toast('已删除'); };
+    $('#vCp').onclick=()=>copyText(`${v.title}\n\n${v.body||''}`,'素材已复制');
+  }
+}
+
+/* ==========================================================================
+   备份：导出 / 导入 / 清空
+   ========================================================================== */
+function bindBackup(){
+  ['expBtn','expBtn2'].forEach(id=>{ const b=$('#'+id); if(b) b.onclick=exportJSON; });
+  ['impBtn','impBtn2'].forEach(id=>{ const b=$('#'+id); if(b) b.onclick=importJSON; });
+  const s=$('#syncBtn'); if(s) s.onclick=()=>setSync(!getSync());
+  const c=$('#clearBtn'); if(c) c.onclick=confirmClear;
+}
+function exportJSON(){
+  try{
+    const payload = JSON.stringify({...DB, exportedAt:new Date().toISOString(), app:'当然可以工作台'}, null, 2);
+    const blob = new Blob([payload], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `当然可以-工作台备份-${today()}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+    toast('已导出备份文件');
+  }catch(e){ toast('导出失败：'+e.message); }
+}
+function importJSON(){
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='.json,application/json';
+  inp.onchange = ()=>{
+    const f = inp.files && inp.files[0]; if(!f) return;
+    const fr = new FileReader();
+    fr.onload = ()=>{
+      try{
+        const p = JSON.parse(fr.result);
+        if(!p || typeof p!=='object') throw new Error('文件格式不正确');
+        openModal(`<h3>确认导入？</h3>
+          <div class="out">即将用备份文件覆盖当前数据：<br>
+          待办 ${(p.schedule||[]).length} 条 · 单词 ${(p.words||[]).length} 个<br>
+          对话 ${(p.dialogues||[]).length} 组 · 药物 ${(p.drugs||[]).length} 条<br>
+          医嘱 ${(p.orders||[]).length} 条 · 文献 ${(p.refs||[]).length} 篇 · 素材 ${(p.vault||[]).length} 条</div>
+          <div class="hint">当前数据将被替换，建议先导出备份。</div>
+          <div class="foot"><button class="btn ghost" onclick="closeModal()">取消</button>
+          <button class="btn primary" id="okImp">确认导入</button></div>`);
+        $('#okImp').onclick=()=>{
+          const base = demoData();
+          DB = Object.assign(base, p);
+          DB.meta = Object.assign(base.meta, p.meta||{});
+          if(!Array.isArray(DB.modules)||DB.modules.length!==5) DB.modules = base.modules;
+          save(); closeModal(); renderSyncPill(); renderRail(); go(currentMod);
+          toast('导入成功，数据已恢复');
+        };
+      }catch(e){ toast('导入失败：'+(e.message||'文件无法解析')); }
+    };
+    fr.readAsText(f);
+  };
+  inp.click();
+}
+function confirmClear(){
+  openModal(`<h3>清空全部数据？</h3>
+    <div class="out">将删除所有待办、单词、对话、药物、医嘱、文献与素材，并重置为初始演示数据。</div>
+    <div class="hint">此操作不可撤销，建议先导出 JSON 备份。</div>
+    <div class="foot"><button class="btn ghost" onclick="closeModal()">取消</button>
+    <button class="btn danger" id="okClear">一键清空</button></div>`);
+  $('#okClear').onclick=()=>{
+    DB = demoData(); save(); closeModal(); renderSyncPill(); renderRail(); go(currentMod);
+    toast('已清空并重置演示数据');
+  };
+}
+
+/* ==========================================================================
+   PWA：manifest / Service Worker / 安装提示（全部资源内联，零外部依赖）
+   说明：Service Worker 脚本浏览器只接受同源 http(s) 文件，不支持 blob:/data:，
+   因此这里内联了完整 SW 源码，并在注册失败时提供一键生成 sw.js 的能力；
+   即使不注册 SW，本应用为单文件自包含，断网同样可完整使用。
+   ========================================================================== */
+const SW_SOURCE = `/* 当然可以 · 个人医疗从业者工作台 — Service Worker（离线缓存） */
+const CACHE = 'dangran-keyi-v4';
+const CORE = ['./', './index.html'];
+
+self.addEventListener('install', event => {
+  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE).then(c => Promise.all(
+      CORE.map(u => c.add(u).catch(() => null))
+    ))
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+
+  if (url.origin !== self.location.origin) return;
+
+  const isDoc = req.mode === 'navigate' ||
+                req.destination === 'document' ||
+                url.pathname === '/' ||
+                url.pathname.endsWith('/') ||
+                url.pathname.endsWith('index.html');
+
+  if (isDoc) {
+    event.respondWith(
+      fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+        return res;
+      }).catch(() =>
+        caches.match(req).then(hit => hit || caches.match('./index.html') || caches.match('./'))
+      )
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(req).then(hit => {
+      if (hit) return hit;
+      return fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+        return res;
+      }).catch(() => hit);
+    })
+  );
+});
+`;
+
+function buildIcon(size, maskable){
+  const r = maskable ? size*0.5 : size*0.22;
+  const cx = size/2;
+  const bar = size*0.115;      /* 十字笔画宽度 */
+  const arm = size*0.30;       /* 十字臂长 */
+  const hx = size*0.70, hy = size*0.665, hr = size*0.135;
+  const s = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F0EEF1"/>
+      <stop offset="45%" stop-color="#D9B4BA"/>
+      <stop offset="100%" stop-color="#CBA0A7"/>
+    </linearGradient>
+  </defs>
+  <rect width="${size}" height="${size}" rx="${r}" fill="url(#g)"/>
+  <rect x="${cx-bar/2}" y="${cx-arm}" width="${bar}" height="${arm*2}" rx="${bar*0.35}" fill="#ffffff" fill-opacity="0.96"/>
+  <rect x="${cx-arm}" y="${cx-bar/2}" width="${arm*2}" height="${bar}" rx="${bar*0.35}" fill="#ffffff" fill-opacity="0.96"/>
+  <path d="M ${hx} ${hy+hr*0.92}
+           C ${hx-hr*1.45} ${hy-hr*0.28}, ${hx-hr*1.02} ${hy-hr*1.42}, ${hx} ${hy-hr*0.52}
+           C ${hx+hr*1.02} ${hy-hr*1.42}, ${hx+hr*1.45} ${hy-hr*0.28}, ${hx} ${hy+hr*0.92} Z"
+        fill="#ffffff" fill-opacity="0.95"/>
+</svg>`;
+  return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(s)));
+}
+
+function buildManifest(){
+  const m = {
+    name: '当然可以 · 个人医疗从业者工作台',
+    short_name: '当然可以',
+    description: '一站式个人医疗从业者工作台：日程待办、医学英语、临床辅助、科研训练与思维库，数据本地存储，支持离线使用。',
+    start_url: './index.html',
+    scope: './',
+    display: 'standalone',
+    display_override: ['standalone','minimal-ui'],
+    orientation: 'portrait-primary',
+    background_color: '#FAFAFA',
+    theme_color: '#D9B4BA',
+    lang: 'zh-CN',
+    dir: 'ltr',
+    categories: ['medical','education','productivity','health'],
+    icons: [
+      {src: buildIcon(192,false), sizes:'192x192', type:'image/svg+xml', purpose:'any'},
+      {src: buildIcon(512,false), sizes:'512x512', type:'image/svg+xml', purpose:'any'},
+      {src: buildIcon(192,true),  sizes:'192x192', type:'image/svg+xml', purpose:'maskable'},
+      {src: buildIcon(512,true),  sizes:'512x512', type:'image/svg+xml', purpose:'maskable'}
+    ]
+  };
+  return 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(m));
+}
+
+const pwa = { deferredPrompt:null, installed:false, swReady:false, dismissed:false, swTried:false };
+function isStandalone(){
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+    || window.navigator.standalone === true
+    || (window.matchMedia && window.matchMedia('(display-mode: minimal-ui)').matches);
+}
+
+function injectPWA(){
+  /* 图标 */
+  let lk = document.querySelector('link[rel="icon"]');
+  if(!lk){ lk = document.createElement('link'); lk.rel='icon'; document.head.appendChild(lk); }
+  lk.type = 'image/svg+xml';
+  lk.href = buildIcon(192,false);
+  const at = document.createElement('link');
+  at.rel='apple-touch-icon'; at.href = buildIcon(180,false);
+  document.head.appendChild(at);
+
+  /* manifest（内联 data URI，无需外部文件） */
+  const mk = document.createElement('link');
+  mk.rel = 'manifest';
+  mk.href = buildManifest();
+  document.head.appendChild(mk);
+
+  /* iOS / 移动端 PWA 元信息 */
+  [['apple-mobile-web-app-capable','yes'],['mobile-web-app-capable','yes'],
+   ['apple-mobile-web-app-status-bar-style','default'],['apple-mobile-web-app-title','当然可以'],
+   ['application-name','当然可以'],['format-detection','telephone=no']].forEach(([n,c])=>{
+    if(document.querySelector(`meta[name="${n}"]`)) return;
+    const m=document.createElement('meta'); m.name=n; m.content=c; document.head.appendChild(m);
+  });
+
+  /* 主题色随界面柔和粉色 */
+  let tc = document.querySelector('meta[name="theme-color"]');
+  if(tc) tc.content = '#FAFAFA';
+}
+
+/* 注册 Service Worker：使用同源真实脚本 ./sw.js（与 index.html 同目录） */
+function registerSW(){
+  if(pwa.swTried) return;
+  if(!('serviceWorker' in navigator)){ setSwState('unsupported'); return; }
+  const secure = location.protocol === 'https:' || ['localhost','127.0.0.1','::1'].includes(location.hostname);
+  if(!secure){ setSwState('insecure'); return; }
+  pwa.swTried = true;
+  navigator.serviceWorker.register('./sw.js', {scope:'./'})
+    .then(()=>setSwState('ok'))
+    .catch(()=>setSwState('noswjs'));
+}
+function setSwState(s){
+  pwa.swReady = (s === 'ok');
+  pwa.swState = s;
+  refreshInstallUI();
+}
+
+/* 下载 sw.js：部署到静态服务器时可一键生成，获得完整离线缓存 */
+function downloadSW(){
+  downloadFile(SW_SOURCE, 'sw.js', 'application/javascript');
+  openModal(`<h3>已生成 sw.js</h3>
+    <div class="out">请把下载的 <b>sw.js</b> 放到与 <b>index.html 同一个文件夹</b>，然后重新打开页面，即可启用完整离线缓存（Service Worker）。</div>
+    <div class="hint">说明：浏览器规范要求 Service Worker 必须是同源的真实脚本文件，不接受内联或 blob 形式，因此需要这一步。<br><br>
+    即使不放置 sw.js，本工作台依然是<b>单文件自包含</b>的：所有界面、样式、逻辑、图标全部内联，断网后照常打开和编辑全部本地数据，只是少了「主动预缓存」这一层。</div>
+    <div class="foot"><button class="btn primary" onclick="closeModal()">我知道了</button></div>`);
+}
+
+/* 复制 SW 源码 */
+function copySWSource(){
+  copyText(SW_SOURCE, 'Service Worker 源码已复制');
+}
+
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  pwa.deferredPrompt = e;
+  refreshInstallUI();
+});
+window.addEventListener('appinstalled', ()=>{
+  pwa.installed = true; pwa.deferredPrompt = null;
+  refreshInstallUI(); hideInstallBanner();
+  toast('已安装到桌面 · 可从桌面直接打开');
+});
+
+function refreshInstallUI(){
+  const banner = $('#installBanner');
+  if(!banner) return;
+  const show = !isStandalone() && !pwa.dismissed;
+  banner.style.display = show ? 'block' : 'none';
+  const btn = $('#ibBtn');
+  if(btn){
+    if(pwa.deferredPrompt) btn.textContent = '一键安装';
+    else if(/iPhone|iPad|iPod/i.test(navigator.userAgent)) btn.textContent = '查看安装方法';
+    else btn.textContent = '安装到桌面';
+  }
+}
+function hideInstallBanner(){ pwa.dismissed = true; const b=$('#installBanner'); if(b) b.style.display='none'; }
+
+async function triggerInstall(){
+  if(pwa.deferredPrompt){
+    try{
+      pwa.deferredPrompt.prompt();
+      const res = await pwa.deferredPrompt.userChoice;
+      toast(res && res.outcome === 'accepted' ? '正在安装…' : '已取消安装');
+      pwa.deferredPrompt = null;
+    }catch(e){ toast('安装调用失败，请用浏览器菜单手动安装'); }
+    refreshInstallUI();
+    return;
+  }
+  const ua = navigator.userAgent;
+  let steps = '';
+  if(/iPhone|iPad|iPod/i.test(ua)){
+    steps = `1. 必须用 <b>Safari</b> 打开本页面<br>2. 点击底部「分享」按钮 <b>⬆︎</b><br>3. 向下找到「<b>添加到主屏幕</b>」<br>4. 点击右上角「添加」即可`;
+  }else if(/Android/i.test(ua)){
+    steps = `1. 用 <b>Chrome</b> 打开本页面<br>2. 点击右上角「<b>⋮</b>」菜单<br>3. 选择「<b>添加到主屏幕</b>」或「<b>安装应用</b>」<br>4. 点击「安装」即可`;
+  }else if(/Macintosh/i.test(ua) && /Safari/i.test(ua)){
+    steps = `1. Safari 菜单栏点击「<b>文件</b>」<br>2. 选择「<b>添加到程序坞…</b>」<br>3. 点击「添加」即可`;
+  }else{
+    steps = `1. 用 <b>Chrome / Edge</b> 打开本页面<br>2. 点击地址栏右侧的「<b>安装</b>」图标 ⊕<br>3. 或打开浏览器菜单选择「<b>安装 当然可以…</b>」<br>4. 点击「安装」即可`;
+  }
+  openModal(`<h3>安装到桌面</h3>
+    <div class="out" style="line-height:1.9">${steps}</div>
+    <div class="hint">安装后从桌面打开<b>没有浏览器地址栏</b>，全屏运行如同原生 App；支持离线使用。</div>
+    <div class="foot"><button class="btn ghost" onclick="closeModal()">关闭</button>
+      <button class="btn primary" id="tryAgain">再试一次自动安装</button></div>`);
+  const t = $('#tryAgain');
+  if(t) t.onclick = ()=>{ closeModal(); setTimeout(()=>{ if(pwa.deferredPrompt) triggerInstall(); else toast('可安装时页面底部会出现「一键安装」按钮'); },200); };
+}
+
+/* ==========================================================================
+   初始化
+   ========================================================================== */
+function boot(){
+  loadDB();
+  injectPWA();
+  registerSW();
+  renderSyncPill();
+  const moved = rollover();
+  buildPages();
+  renderRail();
+  go('schedule');
+  if(moved) setTimeout(()=>toast(`已自动顺延 ${moved} 条未完成待办到今天`),600);
+
+  /* 安装横幅 */
+  const ib = $('#installBanner .ibIco');
+  if(ib) ib.innerHTML = svg('download');
+  const ibBtn = $('#ibBtn');
+  if(ibBtn) ibBtn.onclick = triggerInstall;
+  const ibLater = $('#ibLater');
+  if(ibLater) ibLater.onclick = hideInstallBanner;
+  setTimeout(refreshInstallUI, 300);
+  setTimeout(refreshInstallUI, 1500);
+  window.addEventListener('load', ()=>setTimeout(refreshInstallUI, 200));
+  // 每 5 分钟检查一次日期跨越
+  setInterval(()=>{
+    if(boot.__d !== today()){
+      boot.__d = today();
+      rollover(); renderRail();
+      if(currentMod==='schedule'){ schedDate=today(); renderSchedule(); }
+      toast('已进入新的一天，未完成待办已顺延');
+    }
+  }, 3e5);
+  boot.__d = today();
+
+  // 页面隐藏时立即落盘
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.hidden){ clearTimeout(saveTimer); try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); persistTransHis(); }catch(e){} }
+  });
+  window.addEventListener('beforeunload', ()=>{ try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); persistTransHis(); }catch(e){} });
+
+  // 关闭菜单（长按提示）
+  $('#menuBtn').onclick = ()=>{
+    openSheet(`
+      <div class="sheetTitle">工作台设置</div>
+      <div class="sheetDesc">左侧模块长按可重命名，按住上下拖动可调整顺序。</div>
+      <div class="field"><label>模块（长按可修改名称）</label>
+        ${DB.modules.map(m=>`<button class="btn block" style="justify-content:space-between;margin-bottom:7px" data-mid="${m.id}">
+          <span style="display:flex;align-items:center;gap:8px">${svg(m.icon)}${esc(m.name)}</span>
+          <span style="font-size:11px;color:var(--ink-300)">点击改名</span>
+        </button>`).join('')}
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:12.5px;font-weight:700;margin-bottom:9px">应用与离线</div>
+      <div class="row" style="margin-bottom:9px">
+        <button class="btn ghost sm" id="shInstall">${svg('download')}安装到桌面</button>
+        <button class="btn ghost sm" id="shOffline">${svg('check')}离线状态</button>
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:12.5px;font-weight:700;margin-bottom:9px">数据管理</div>
+      <div class="row" style="margin-bottom:8px">
+        <button class="btn ghost sm" id="shExp">${svg('download')}导出 JSON</button>
+        <button class="btn ghost sm" id="shImp">${svg('upload')}导入恢复</button>
+      </div>
+      <div class="row" style="margin-bottom:9px">
+        <button class="btn ghost sm" id="shSync">${svg('refresh')}${getSync()?'断开设备连接':'连接设备'}</button>
+        <button class="btn danger sm" id="shClear">${svg('trash')}清空演示数据</button>
+      </div>
+      <div class="hint">数据保存在本机浏览器存储中，自动保存，关闭页面不会丢失。当前设备状态：<b>${getSync()?'已连接（可同步）':'未连接（仅本机）'}</b><br>
+      运行模式：<b>${isStandalone()?'独立应用（已安装）':'浏览器标签页'}</b> · 离线缓存：<b>${pwa.swReady?'已就绪':'单文件自包含（无需缓存）'}</b></div>`);
+    $$('#sheet [data-mid]').forEach(b=>b.onclick=()=>{ closeSheet(); setTimeout(()=>openModEditor(b.dataset.mid),160); });
+    $('#shInstall').onclick=()=>{ closeSheet(); setTimeout(triggerInstall,160); };
+    $('#shOffline').onclick=()=>{
+      const st = pwa.swState;
+      const swTxt = st==='ok' ? '已注册，核心资源已预缓存'
+        : st==='insecure' ? '未注册（需 https 或 localhost 环境）'
+        : st==='unsupported' ? '当前浏览器不支持'
+        : st==='noswjs' ? '未启用（同目录缺少 sw.js）'
+        : '未启用';
+      openModal(`<h3>应用与离线状态</h3>
+        <div class="out">运行模式：<b>${isStandalone()?'独立应用（已安装到桌面）':'浏览器标签页'}</b><br>
+        网络状态：<b>${navigator.onLine?'在线':'离线'}</b><br>
+        数据存储：<b>localStorage（本机持久）</b><br>
+        Service Worker：<b>${swTxt}</b><br>
+        资源自包含：<b>是（单文件内联，无外部依赖）</b></div>
+        <div class="hint">本工作台为<b>单文件自包含</b>应用：全部界面、样式、图标、逻辑都内联在同一个 HTML 中。
+        断网后依然可以打开、查看和编辑全部本地数据。<br><br>
+        Service Worker 用于额外一层「主动预缓存」，浏览器规范要求它必须是<b>同源真实脚本文件</b>（不接受内联/blob），
+        若你的部署环境允许，点击下方按钮生成 sw.js 放在同目录即可启用。</div>
+        <div class="foot"><button class="btn ghost" id="swCopy">复制 SW 源码</button>
+          <button class="btn primary" id="swDl">生成 sw.js</button></div>`);
+      $('#swDl').onclick=()=>{ closeModal(); setTimeout(downloadSW,150); };
+      $('#swCopy').onclick=()=>{ closeModal(); setTimeout(copySWSource,150); };
+    };
+    $('#shExp').onclick=()=>{ closeSheet(); exportJSON(); };
+    $('#shImp').onclick=()=>{ closeSheet(); importJSON(); };
+    $('#shSync').onclick=()=>{ closeSheet(); setSync(!getSync()); };
+    $('#shClear').onclick=()=>{ closeSheet(); confirmClear(); };
+  };
+
+  // 全局：检查今日提醒
+  DB.schedule.filter(x=>x.date===today() && x.time && !x.done).forEach(x=>{
+    const when=new Date(`${x.date}T${x.time}:00`).getTime();
+    const diff=when-nowTs();
+    if(diff>0 && diff<864e5){
+      setTimeout(()=>{
+        toast(`待办提醒：${x.title}`);
+        try{ if('Notification' in window && Notification.permission==='granted') new Notification('当然可以 · 待办提醒',{body:x.title}); }catch(e){}
+      }, diff);
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
